@@ -40,7 +40,7 @@
     </div>
     <div class="card card-md">
       <div class="card-body">
-        <h2 class="h2 text-center mb-4">Login to your account</h2>
+        <h2 class="h2 text-center mb-4">Login to your account [admin]</h2>
 
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
