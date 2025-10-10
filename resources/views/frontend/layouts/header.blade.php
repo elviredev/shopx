@@ -65,7 +65,7 @@
               <div class="header-action-icon-2">
                 <a href="#">
                   <img class="svgInject" alt="ShopX"
-                       src="assets/imgs/theme/icons/icon-compare.svg" />
+                       src="{{ asset('assets/frontend/dist/imgs/theme/icons/icon-compare.svg') }}" />
                   <span class="pro-count blue">3</span>
                 </a>
                 <a href="#"><span class="lable ml-0">Compare</span></a>
@@ -73,14 +73,14 @@
               <div class="header-action-icon-2">
                 <a href="#">
                   <img class="svgInject" alt="ShopX"
-                       src="assets/imgs/theme/icons/icon-heart.svg" />
+                       src="{{ asset('assets/frontend/dist/imgs/theme/icons/icon-heart.svg') }}" />
                   <span class="pro-count blue">6</span>
                 </a>
                 <a href="#"><span class="lable">Wishlist</span></a>
               </div>
               <div class="header-action-icon-2">
                 <a class="mini-cart-icon" href="#">
-                  <img alt="ShopX" src="assets/imgs/theme/icons/icon-cart.svg" />
+                  <img alt="ShopX" src="{{ asset('assets/frontend/dist/imgs/theme/icons/icon-cart.svg') }}" />
                   <span class="pro-count blue">2</span>
                 </a>
                 <a href="#"><span class="lable">Cart</span></a>
@@ -89,7 +89,7 @@
                     <li>
                       <div class="shopping-cart-img">
                         <a href="#"><img alt="ShopX"
-                                         src="assets/imgs/shop/thumbnail-3.jpg" /></a>
+                           src="{{ asset('assets/frontend/dist/imgs/shop/thumbnail-3.jpg') }}" /></a>
                       </div>
                       <div class="shopping-cart-title">
                         <h4><a href="#">Daisy Casual Bag</a></h4>
@@ -125,11 +125,11 @@
                 </div>
               </div>
               <div class="header-action-icon-2">
-                <a href="#">
+                <a href="{{ route('login') }}">
                   <img class="svgInject" alt="ShopX"
-                       src="assets/imgs/theme/icons/icon-user.svg" />
+                       src="{{ asset('assets/frontend/dist/imgs/theme/icons/icon-user.svg') }}" />
                 </a>
-                <a href="#"><span class="lable ml-0">Account</span></a>
+                <a href="{{ route('login') }}"><span class="lable ml-0">Account</span></a>
                 <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
                   <ul>
                     <li>

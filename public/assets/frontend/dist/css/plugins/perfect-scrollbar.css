@@ -19,7 +19,7 @@
   -webkit-transition: background-color .2s linear, opacity .2s linear;
   height: 15px;
   /* there must be 'bottom' or 'top' for ps__rail-x */
-  bottom: 0px;
+  bottom: 0;
   /* please don't change 'position' */
   position: absolute;
 }
@@ -57,7 +57,6 @@
 .ps .ps__rail-y:focus,
 .ps .ps__rail-x.ps--clicking,
 .ps .ps__rail-y.ps--clicking {
-  background-color: $border-color;
   opacity: 0.9;
 }
 
