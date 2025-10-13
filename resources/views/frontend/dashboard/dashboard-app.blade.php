@@ -36,7 +36,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#account-detail" >
+                    <a class="nav-link" href="{{ route('profile') }}" >
                       <i class="fi-rs-user mr-10"></i>Account details
                     </a>
                   </li>
@@ -46,10 +46,13 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="login.html">
+                    <a onclick="event.preventDefault(); $('.form-logout').submit()" class="nav-link" href="#">
                       <i class="fi-rs-sign-out mr-10"></i>Logout
                     </a>
                   </li>
+                  <form class="form-logout" action="{{ route('logout') }}" method="POST">
+                    @csrf
+                  </form>
                 </ul>
               </div>
             </div>
