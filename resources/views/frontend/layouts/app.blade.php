@@ -13,6 +13,8 @@
   <meta property="og:image" content=""/>
   <!-- Favicon -->
   <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/frontend/dist/imgs/theme/favicon.svg') }}"/>
+  <!-- JQuery Upload Preview -->
+  <link rel="stylesheet" href="{{ asset('assets/global/upload-preview/upload-preview.css') }}">
   <!-- Fontawesome -->
   <link
     rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -21,6 +23,8 @@
 
   <!-- Template CSS -->
   <link rel="stylesheet" href="{{ asset('assets/frontend/dist/css/main.css') }}"/>
+
+  @stack('styles')
 </head>
 
 <body>
@@ -170,9 +174,13 @@
 <script src="{{ asset('assets/frontend/dist/js/plugins/custom-parallax.js') }}"></script>
 <script src="{{ asset('assets/frontend/dist/js/plugins/leaflet.js') }}"></script>
 <script src="{{ asset('assets/frontend/dist/js/plugins/TweenMax.min.js') }}"></script>
+<!-- JQuery Upload Preview -->
+<script src="{{ asset('assets/global/upload-preview/upload-preview.min.js') }}"></script>
 <!-- Template  JS -->
 <script src="{{ asset('assets/frontend/dist/js/main.js') }}"></script>
 <script src="{{ asset('assets/frontend/dist/js/shop.js') }}"></script>
+
+@stack('scripts')
 </body>
 
 </html>

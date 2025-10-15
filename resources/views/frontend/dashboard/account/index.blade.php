@@ -11,11 +11,15 @@
       <div class="card-body p-0">
         <p>You can edit your account details here.</p>
 
-        <form method="POST" action="{{ route('profile.update') }}">
+        <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
           @csrf
           @method('PUT')
 
           <div class="row mt-30">
+
+            <!--Image Preview-->
+            <x-input-image id="image-preview" name="avatar" :image="auth('web')->user()->avatar" />
+
             <div class="form-group col-md-12">
               <label>Name <span class="required">*</span></label>
               <input required="" class="form-control"
@@ -54,7 +58,7 @@
       <div class="card-body p-0">
         <p>You can change your password here.</p>
 
-        <form method="POST" action="{{ route('password.update') }}">
+        <form method="POST" action="{{ route('password.update') }}" >
           @csrf
           @method('PUT')
 
@@ -90,6 +94,19 @@
   </div>
 @endsection
 
-
+@push('scripts')
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $.uploadPreview({
+        input_field: "#image-upload",   // Default: .image-upload
+        preview_box: "#image-preview",  // Default: .image-preview
+        label_field: "#image-label",    // Default: .image-label
+        label_default: "Choose File",   // Default: Choose File
+        label_selected: "Change File",  // Default: Change File
+        no_label: false                 // Default: false
+      });
+    });
+  </script>
+@endpush
 
 
