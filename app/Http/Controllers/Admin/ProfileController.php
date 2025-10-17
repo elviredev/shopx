@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Frontend;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AlertService;
@@ -14,34 +14,34 @@ class ProfileController extends Controller
   use FileUploadTrait;
 
   /**
-   * @desc Afficher la page Profil Utilisateur
+   * @desc Afficher la page de modification de profile de Admin
    * @return View
    */
-  public function index() : View
+  public function index(): View
   {
-    return view('frontend.dashboard.account.index');
+    return view('admin.profile.index');
   }
 
   /**
-   * @desc Modifier les infos du profil utilisateur
+   * @desc Modifier les infos du profil admin
    * @param Request $request
    * @return RedirectResponse
    */
-  public function profileUpdate(Request $request) : RedirectResponse
+  public function profileUpdate(Request $request): RedirectResponse
   {
     $request->validate([
       'name' => ['required', 'string', 'max:50'],
-      'email' => ['required', 'email', 'unique:users,email,'.auth('web')->user()->id],
+      'email' => ['required', 'email', 'unique:admins,email,'.auth('admin')->user()->id],
       'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg', 'max:2048'],
     ]);
 
-    $user = auth('web')->user();
+    $user = auth('admin')->user();
 
     if ($request->hasFile('avatar')) {
-      // Trait FileUploadTrait
       $filePath = $this->uploadFile($request->file('avatar'), $user->avatar);
       $filePath ? $user->avatar = $filePath : null;
     }
+
     $user->name = $request->name;
     $user->email = $request->email;
     $user->save();
@@ -56,14 +56,14 @@ class ProfileController extends Controller
    * @param Request $request
    * @return RedirectResponse
    */
-  public function passwordUpdate(Request $request) : RedirectResponse
+  public function passwordUpdate(Request $request): RedirectResponse
   {
     $request->validate([
-      'current_password' => ['required', 'string', 'current_password'],
+      'current_password' => ['required', 'string', 'current_password:admin'],
       'password' => ['required', 'string', 'confirmed', 'min:8'],
     ]);
 
-    $user = auth('web')->user();
+    $user = auth('admin')->user();
     $user->password = bcrypt($request->password);
     $user->save();
 
@@ -71,3 +71,11 @@ class ProfileController extends Controller
     return redirect()->back();
   }
 }
+
+
+
+
+
+
+
+

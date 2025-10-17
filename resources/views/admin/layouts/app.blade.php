@@ -9,15 +9,18 @@
 {{--  <link href="./dist/libs/jsvectormap/dist/jsvectormap.css?1750026893" rel="stylesheet" />--}}
   <!-- END PAGE LEVEL STYLES -->
 
-  <!-- BEGIN GLOBAL MANDATORY STYLES -->
+  <!-- JQuery Upload Preview -->
+  <link rel="stylesheet" href="{{ asset('assets/global/upload-preview/upload-preview.css') }}">
+  <!-- Custom CSS -->
   <link href="{{ asset('assets/admin/dist/css/tabler.css') }}" rel="stylesheet" />
-  <!-- END GLOBAL MANDATORY STYLES -->
 
   <!-- BEGIN CUSTOM FONT -->
   <style>
     @import url("https://rsms.me/inter/inter.css");
   </style>
   <!-- END CUSTOM FONT -->
+
+  @stack('styles')
 </head>
 <body>
 <!-- BEGIN GLOBAL THEME SCRIPT -->
@@ -62,8 +65,13 @@
 
 <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<!-- JQuery Upload Preview -->
+<script src="{{ asset('assets/global/upload-preview/upload-preview.min.js') }}"></script>
+<!-- Custom JS -->
 <script src="{{ asset('assets/admin/dist/js/tabler.min.js') }}" defer></script>
 <!-- END GLOBAL MANDATORY SCRIPTS -->
 
+@stack('scripts')
 </body>
 </html>

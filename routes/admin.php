@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Admin\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\Auth\VerifyEmailController;
+use App\Http\Controllers\Admin\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // ex: pour URL - admin/login, pour name - admin.login
@@ -54,10 +55,18 @@ Route::middleware('auth:admin')
 
   Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
-  Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+//  Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
   Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
+
+  /** Profile Routes */
+  Route::get('/profile', [ProfileController::class, 'index'])
+    ->name('profile.index');
+  Route::put('/profile', [ProfileController::class, 'profileUpdate'])
+    ->name('profile.update');
+  Route::put('/profile/password', [ProfileController::class, 'passwordUpdate'])
+    ->name('password.update');
 });
 
 /*================= Dashboard ADMIN =================*/
