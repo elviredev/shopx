@@ -1558,6 +1558,19 @@ label {
   color: #777777;
 }
 
+.placeholder-style::placeholder {
+  color: #6c757d;
+  font-size: 0.800rem;
+  opacity: 1;
+}
+
+.placeholder-style,
+.placeholder-style option {
+  color: #6c757d;
+  font-size: 0.800rem;
+  opacity: 1;
+}
+
 .nice-select .list {
   width: 100%;
 }
@@ -9893,7 +9906,7 @@ footer .hotline img {
 }
 
 /***************************
-    Page section margin 
+    Page section margin
 ****************************/
 .mtb-0 {
   margin: 0;

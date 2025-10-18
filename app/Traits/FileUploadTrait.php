@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\File;
 
 trait FileUploadTrait
 {
+  /**
+   * @desc Upload un fichier non sensible dans le dossier public/uploads
+   * @param UploadedFile $file
+   * @param string|null $oldPath
+   * @param string|null $path
+   * @return string|null
+   */
   public function uploadFile(UploadedFile $file, ?string $oldPath = null, ?string $path = 'uploads') : ?string
   {
     if (!$file->isValid()) {
@@ -30,5 +37,24 @@ trait FileUploadTrait
     $file->move($folderPath, $filename);
 
     return $path . '/' . $filename;
+  }
+
+  public function uploadPrivateFile(UploadedFile $file, ?string $oldPath = null, ?string $path = 'uploads') : ?string
+  {
+    if (!$file->isValid()) {
+      return null;
+    }
+
+//    $ignorePath = ['/default/avatar.png'];
+
+//    if ($oldPath && File::exists(public_path($oldPath)) && !in_array($oldPath, $ignorePath)) {
+//      File::delete(public_path($oldPath));
+//    }
+
+    $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+    $path = $file->storeAs($path, $filename, 'local');
+
+    return $path;
   }
 }

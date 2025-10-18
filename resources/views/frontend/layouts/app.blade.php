@@ -15,6 +15,8 @@
   <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/frontend/dist/imgs/theme/favicon.svg') }}"/>
   <!-- JQuery Upload Preview -->
   <link rel="stylesheet" href="{{ asset('assets/global/upload-preview/upload-preview.css') }}">
+  <!-- Bootstrap Datepicker -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css" integrity="sha512-34s5cpvaNG3BknEWSuOncX28vz97bRI59UnVtEEpFX536A7BtZSJHsDyFoCl8S7Dt2TPzcrCEoHBGeM4SUBDBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Fontawesome -->
   <link
     rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -176,9 +178,12 @@
 <script src="{{ asset('assets/frontend/dist/js/plugins/TweenMax.min.js') }}"></script>
 <!-- JQuery Upload Preview -->
 <script src="{{ asset('assets/global/upload-preview/upload-preview.min.js') }}"></script>
+<!-- Bootstrap Datepicker -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js" integrity="sha512-LsnSViqQyaXpD4mBBdRYeP6sRwJiJveh2ZIbW41EBrNmKxgr/LFZIiWT6yr+nycvhvauz8c2nYMhrP80YhG7Cw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- Template  JS -->
 <script src="{{ asset('assets/frontend/dist/js/main.js') }}"></script>
 <script src="{{ asset('assets/frontend/dist/js/shop.js') }}"></script>
+<script src="{{ asset('assets/frontend/dist/js/frontend.js') }}"></script>
 
 @stack('scripts')
 </body>
