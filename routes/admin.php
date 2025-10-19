@@ -5,11 +5,10 @@ use App\Http\Controllers\Admin\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Admin\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Admin\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Admin\Auth\NewPasswordController;
-use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Admin\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\Auth\VerifyEmailController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\KycRequestController;
 use Illuminate\Support\Facades\Route;
 
 // ex: pour URL - admin/login, pour name - admin.login
@@ -67,6 +66,15 @@ Route::middleware('auth:admin')
     ->name('profile.update');
   Route::put('/profile/password', [ProfileController::class, 'passwordUpdate'])
     ->name('password.update');
+
+  /** KYC Routes */
+  route::get('/kyc-requests', [KycRequestController::class, 'index'])->name('kyc.index');
+  route::get('/kyc-requests/pending', [KycRequestController::class, 'pending'])->name('kyc.pending');
+  route::get('/kyc-requests/rejected', [KycRequestController::class, 'rejected'])->name('kyc.rejected');
+  route::get('/kyc-requests/approved', [KycRequestController::class, 'approved'])->name('kyc.approved');
+  route::get('/kyc-requests/{kyc_request}', [KycRequestController::class, 'show'])->name('kyc.show');
+  route::get('/kyc-requests/download/{kyc_request}', [KycRequestController::class, 'download'])->name('kyc.download');
+  route::put('/kyc-requests/{kyc_request}/update', [KycRequestController::class, 'update'])->name('kyc.update');
 });
 
 /*================= Dashboard ADMIN =================*/
