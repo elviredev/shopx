@@ -15,7 +15,7 @@
           <div class="row">
             <div class="col-md-3">
               <div class="mb-3">
-                <x-input-image name="avatar" id="image-preview" :image="asset(auth('admin')->user()->avatar)" />
+                <x-input-image imagePreviewId="image-preview" imageUploadId="image-upload" imageLabelId="image-label" name="avatar" :image="asset(auth('admin')->user()->avatar)" />
                 <x-input-error :messages="$errors->get('avatar')" />
               </div>
             </div>
