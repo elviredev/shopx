@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\Auth\VerifyEmailController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\KycRequestController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserRoleController;
 use Illuminate\Support\Facades\Route;
 
 // ex: pour URL - admin/login, pour name - admin.login
@@ -78,7 +79,8 @@ Route::middleware('auth:admin')
   route::put('/kyc-requests/{kyc_request}/update', [KycRequestController::class, 'update'])->name('kyc.update');
 
   /** Role Routes */
-  route::resource('role', RoleController::class);
+  route::resource('/role', RoleController::class);
+  route::resource('/role-user', UserRoleController::class);
 });
 
 /*================= Dashboard ADMIN =================*/
