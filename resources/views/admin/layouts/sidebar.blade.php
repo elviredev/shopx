@@ -60,7 +60,8 @@
           </a>
         </li>
 
-        <li class="nav-item dropdown">
+        @if(hasPermission(['KYC Management']))
+          <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
             href="#navbar-base"
@@ -93,6 +94,7 @@
             </div>
           </div>
         </li>
+        @endif
 
         <li class="nav-item dropdown">
           <a
@@ -112,7 +114,7 @@
             <div class="dropdown-menu-columns">
               <div class="dropdown-menu-column">
                 <a class="dropdown-item" href="{{ route('admin.role.index') }}">
-                  Role
+                  Roles
                 </a>
               </div>
 
