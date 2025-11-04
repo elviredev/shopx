@@ -27,10 +27,12 @@
                 <td>{{ $role->name }}</td>
                 <td><span class="badge bg-primary-lt">{{ $role->permissions_count }}</span></td>
                 <td>
-                  <div class="d-flex gap-2">
-                    <a class="btn btn-sm btn-primary" href="{{ route('admin.role.edit', $role) }}">Edit</a>
-                    <a class="btn btn-sm btn-danger delete-item" href="{{ route('admin.role.destroy', $role) }}">Delete</a>
-                  </div>
+                  @if($role->name !== "Super Admin")
+                    <div class="d-flex gap-2">
+                      <a class="btn btn-sm btn-primary" href="{{ route('admin.role.edit', $role) }}">Edit</a>
+                      <a class="btn btn-sm btn-danger delete-item" href="{{ route('admin.role.destroy', $role) }}">Delete</a>
+                    </div>
+                  @endif
                 </td>
               </tr>
             @empty

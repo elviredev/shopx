@@ -18,6 +18,7 @@ class KycRequestController extends Controller implements HasMiddleware
 {
   /**
    * @desc Middleware pour vérifier l'autorisation d'accès aux méthodes du controller
+   * si user n'a pas la permission, il ne pourra pas accèder aux routes et vues du controller
    * @return Middleware[]
    */
   static function Middleware(): array

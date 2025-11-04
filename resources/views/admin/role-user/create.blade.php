@@ -65,6 +65,7 @@
                 <select name="role" id="" class="form-select">
                   <option value="">Select</option>
                   @foreach($roles as $role)
+                    @if($role->name == 'Super Admin') @continue @endif
                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                   @endforeach
                 </select>

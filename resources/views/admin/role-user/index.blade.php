@@ -33,10 +33,12 @@
                   @endforeach
                 </td>
                 <td>
-                  <div class="d-flex gap-2">
-                    <a class="btn btn-sm btn-primary" href="{{ route('admin.role-user.edit', $admin) }}">Edit</a>
-                    <a class="btn btn-sm btn-danger delete-item" href="{{ route('admin.role-user.destroy', $admin) }}">Delete</a>
-                  </div>
+                  @if(!$admin->hasRole('Super Admin'))
+                    <div class="d-flex gap-2">
+                      <a class="btn btn-sm btn-primary" href="{{ route('admin.role-user.edit', $admin) }}">Edit</a>
+                      <a class="btn btn-sm btn-danger delete-item" href="{{ route('admin.role-user.destroy', $admin) }}">Delete</a>
+                    </div>
+                  @endif
                 </td>
               </tr>
             @empty

@@ -9,11 +9,25 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
-class UserRoleController extends Controller
+class UserRoleController extends Controller implements HasMiddleware
 {
+  /**
+   * @desc Middleware pour vérifier l'autorisation d'accès aux méthodes du controller
+   * si user n'a pas la permission, il ne pourra pas accèder aux routes et vues du controller
+   * @return Middleware[]
+   */
+  static function Middleware(): array
+  {
+    return [
+      new Middleware('permission:Role User Management')
+    ];
+  }
+
   /**
    * Display a listing of the resource.
    */
@@ -45,6 +59,11 @@ class UserRoleController extends Controller
 
     $role = Role::findOrFail($request->role);
 
+    if($role->name == 'Super Admin') {
+      AlertService::error('You can not create Super Admin user.');
+      return to_route('admin.role-user.index');
+    }
+
     $admin = new Admin();
     $admin->name = $request->name;
     $admin->email = $request->email;
@@ -74,12 +93,23 @@ class UserRoleController extends Controller
    */
   public function update(Request $request, Admin $role_user)
   {
+    // check if role_user is super admin
+    if($role_user->hasRole('Super Admin')) {
+      AlertService::error('You can not update Super Admin user.');
+      return to_route('admin.role-user.index');
+    }
+
     $request->validate([
       'name' => ['required', 'string', 'max:255'],
       'email' => ['required', 'email', 'unique:admins,email,' . $role_user->id],
     ]);
 
     $role = Role::findOrFail($request->role);
+
+    if($role->name == 'Super Admin') {
+      AlertService::error('You can not update Super Admin user.');
+      return to_route('admin.role-user.index');
+    }
 
     $admin = $role_user;
     $admin->name = $request->name;
@@ -107,6 +137,11 @@ class UserRoleController extends Controller
    */
   public function destroy(Admin $role_user): JsonResponse
   {
+    // check if role_user is super admin
+    if($role_user->hasRole('Super Admin')) {
+      return response()->json(['status' => 'error', 'message' => 'You can not delete Super Admin user.']);
+    }
+
     try {
       // remove roles from user
       foreach ($role_user->getRoleNames() as $role) {
