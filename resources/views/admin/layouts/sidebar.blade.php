@@ -16,8 +16,8 @@
 
     <!-- BEGIN NAVBAR LOGO -->
     <div class="navbar-brand navbar-brand-autodark">
-      <a href="{{ route('admin.dashboard') }}" aria-label="Tabler"
-      ><svg xmlns="http://www.w3.org/2000/svg" width="110" height="32" viewBox="0 0 232 68" class="navbar-brand-image">
+      <a href="{{ route('admin.dashboard') }}" aria-label="Tabler">
+        <svg xmlns="http://www.w3.org/2000/svg" width="110" height="32" viewBox="0 0 232 68" class="navbar-brand-image">
           <path
             d="M64.6 16.2C63 9.9 58.1 5 51.8 3.4 40 1.5 28 1.5 16.2 3.4 9.9 5 5 9.9 3.4 16.2 1.5 28 1.5 40 3.4 51.8 5 58.1 9.9 63 16.2 64.6c11.8 1.9 23.8 1.9 35.6 0C58.1 63 63 58.1 64.6 51.8c1.9-11.8 1.9-23.8 0-35.6zM33.3 36.3c-2.8 4.4-6.6 8.2-11.1 11-1.5.9-3.3.9-4.8.1s-2.4-2.3-2.5-4c0-1.7.9-3.3 2.4-4.1 2.3-1.4 4.4-3.2 6.1-5.3-1.8-2.1-3.8-3.8-6.1-5.3-2.3-1.3-3-4.2-1.7-6.4s4.3-2.9 6.5-1.6c4.5 2.8 8.2 6.5 11.1 10.9 1 1.4 1 3.3.1 4.7zM49.2 46H37.8c-2.1 0-3.8-1-3.8-3s1.7-3 3.8-3h11.4c2.1 0 3.8 1 3.8 3s-1.7 3-3.8 3z"
             fill="#066fd1"
@@ -29,7 +29,8 @@
             clip-rule="evenodd"
             fill="#4a4a4a"
           /></svg
-        ></a>
+        >
+      </a>
     </div>
     <!-- END NAVBAR LOGO -->
 
@@ -37,24 +38,9 @@
       <!-- BEGIN NAVBAR MENU -->
       <ul class="navbar-nav pt-lg-3">
         <li class="nav-item">
-          <a class="nav-link" href="./">
+          <a class="nav-link" href="{{ route('admin.dashboard') }}">
             <span class="nav-link-icon d-md-none d-lg-inline-block">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon icon-1"
-              >
-                <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg
-              >
+              <i class="ti ti-home"></i>
             </span>
             <span class="nav-link-title"> Home </span>
           </a>
@@ -71,7 +57,7 @@
             aria-expanded="false"
           >
             <span class="nav-link-icon d-md-none d-lg-inline-block">
-
+              <i class="ti ti-user-check"></i>
             </span>
             <span class="nav-link-title"> KYC Requests </span>
           </a>
@@ -107,7 +93,7 @@
             aria-expanded="false"
           >
             <span class="nav-link-icon d-md-none d-lg-inline-block">
-
+              <i class="ti ti-shield"></i>
             </span>
             <span class="nav-link-title"> Access Management </span>
           </a>
@@ -132,6 +118,15 @@
           </div>
         </li>
         @endif
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('admin.settings.index') }}">
+            <span class="nav-link-icon d-md-none d-lg-inline-block">
+              <i class="ti ti-settings"></i>
+            </span>
+            <span class="nav-link-title"> Settings </span>
+          </a>
+        </li>
 
         {{-- <li class="nav-item dropdown">
           <a
@@ -305,10 +300,10 @@
       </div>
       <div class="nav-item dropdown">
         <a href="#" class="nav-link d-flex lh-1 p-0 px-2" data-bs-toggle="dropdown" aria-label="Open user menu">
-          <span class="avatar avatar-sm" style="background-image: url(./static/avatars/000m.jpg)"> </span>
+          <span class="avatar avatar-sm" style="background-image: url({{ asset(auth('admin')->user()->avatar) }})"> </span>
           <div class="d-none d-xl-block ps-2">
             <div>{{ auth('admin')->user()->name }}</div>
-            <div class="mt-1 small text-secondary">UI Designer</div>
+            <div class="mt-1 small text-secondary">{{ auth('admin')->user()?->getRoleNames()?->first() }}</div>
           </div>
         </a>
         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">

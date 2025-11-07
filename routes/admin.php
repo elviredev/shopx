@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\KycRequestController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 // ex: pour URL - admin/login, pour name - admin.login
@@ -81,6 +82,10 @@ Route::middleware('auth:admin')
   /** Role Routes */
   route::resource('/role', RoleController::class);
   route::resource('/role-user', UserRoleController::class);
+
+  /** Settings Routes */
+  route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+  route::put('/settings/general-settings', [SettingController::class, 'generalSettings'])->name('settings.general');
 });
 
 /*================= Dashboard ADMIN =================*/

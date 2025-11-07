@@ -12,6 +12,10 @@
 
   <!-- JQuery Upload Preview -->
   <link rel="stylesheet" href="{{ asset('assets/global/upload-preview/upload-preview.css') }}">
+
+  <!-- CDN Tabler Icons -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.35.0/dist/tabler-icons.min.css" />
   <!-- Custom CSS -->
   <link href="{{ asset('assets/admin/dist/css/tabler.css') }}" rel="stylesheet" />
 
