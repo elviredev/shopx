@@ -7,6 +7,8 @@ use App\Models\Category;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
@@ -55,6 +57,43 @@ class CategoryController extends Controller
       'message' => 'Category created successfully',
       'category' => $category
     ]);
+  }
+
+  public function updateOrder(Request $request)
+  {
+    $tree = $request->tree;
+
+    try {
+      DB::transaction(function () use ($tree) {
+        $this->updateTree($tree, null);
+      });
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Categories reordered successfully'
+      ]);
+    } catch(\Throwable $th) {
+      Log::error('Category reorder error: ' . $th->getMessage());
+      return response()->json([
+        'success' => false,
+        'message' => $th->getMessage()
+      ], 500);
+    }
+  }
+
+  public function updateTree($nodes, $parentId)
+  {
+    foreach ($nodes as $position => $node) {
+      $category = Category::find($node['id']);
+      $category->update([
+        'parent_id' => $parentId,
+        'position' => $position
+      ]);
+
+      if (isset($node['children']) && is_array($node['children'])) {
+        $this->updateTree($node['children'], $category->id);
+      }
+    }
   }
 
   /**

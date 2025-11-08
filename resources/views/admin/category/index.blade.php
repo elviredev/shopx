@@ -1,5 +1,57 @@
 @extends('admin.layouts.app')
 
+@push('styles')
+  <style>
+    .dd-item.custom-cat-item {
+      border: none;
+      padding: 0;
+      margin-bottom: 0;
+      background: none;
+      border-radius: 0;
+    }
+
+    .dd-item-row.custom-cat-row {
+      user-select: text;
+      background: none;
+      gap: 4px;
+      border: 1px solid #e9ecef;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      padding-left: 0.75rem;
+      /* px-2 */
+      padding-right: 0.75rem;
+      padding-top: 0.25rem;
+      /* py-1 */
+      padding-bottom: 0.25rem;
+    }
+
+    .dd-handle.custom-cat-handle {
+      cursor: move;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.5rem;
+      /* me-2 */
+    }
+
+    .cat-folder-icon {
+      font-size: 16px;
+      color: #6c757d;
+    }
+
+    .cat-label.custom-cat-label {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex: 1 1 auto;
+    }
+  </style>
+@endpush
+
 @section('contents')
   <div class="container-fluid mt-4">
     <div class="row">
@@ -10,8 +62,13 @@
             <button class="btn btn-primary">New</button>
           </div>
           <div class="card-body">
-            <div id="category-tree" class="dd"></div>
-            <div id="tree-loading" class="text-center my-2">
+            <!-- Category tree -->
+            <div id="category-tree" class="dd">
+
+            </div>
+
+            <!-- Loading spinner -->
+            <div id="tree-loading" class="text-center my-2 d-none">
               <div class="spinner-border"></div>
             </div>
           </div>
@@ -66,6 +123,77 @@
 @push('scripts')
   <script>
     $(function() {
+
+      function loadTree() {
+        $('#tree-loading').show();
+
+        $.get("{{ route('admin.categories.nested') }}", function(data) {
+          $('#category-tree').empty();
+          let html = '<div class="dd" id="nestable-tree">' + renderTree(data) + '</div>';
+          $('#category-tree').html(html);
+
+          // drag & drop
+          $('#nestable-tree').nestable({
+              maxDepth: 3
+            })
+            .off('change')
+            .on('change', function(e) {
+              if(!$(e.target).hasClass('no-drag')) {
+                console.log(e);
+                updateOrder();
+              }
+            });
+            $('#tree-loading').hide();
+        })
+      }
+
+      function renderTree(categories) {
+        if(!categories.length) return;
+        let html = '<ol class="dd-list" style="margin-bottom: 0;">';
+
+        categories.forEach(function(cat) {
+          html +=
+            `<li class="dd-item custom-cat-item" data-id="${cat.id}">
+              <div class="dd-item-row custom-cat-row">
+                <div class="dd-handle custom-cat-handle" title="Drag to reorder">
+                  <i class="ti ti-grip-horizontal"></i>
+                </div>
+                <i class="ti ti-folder cat-folder-icon"></i>
+                <div class="cat-label custom-cat-label" data-id="${cat.id}">
+                  <span>${cat.name}</span>
+                  ${cat.is_active ? '<span class="text-success ms-2" style="font-size: 10px">&#9679</span>' : '<span class="text-danger ms-2" style="font-size: 10px">&#9679</span>'}
+                </div>
+              </div>`
+          if(cat.children_nested && cat.children_nested.length) {
+            html += renderTree(cat.children_nested);
+          }
+          html += '</li>';
+        })
+
+        html += '</ol>';
+
+        return html;
+      }
+
+      function updateOrder() {
+        let tree = $('#nestable-tree').nestable('serialize');
+        $.post({
+          url: "{{ route('admin.categories.update-order') }}",
+          data: {
+            tree: tree,
+            _token: '{{ csrf_token() }}'
+          },
+          success: function(response) {
+            if(response.success) {
+              notyf.success(response.message);
+            }
+          },
+          error: function(xhr, status, error) {
+
+          }
+        })
+      }
+
       $('#category-form').submit(function(e) {
         e.preventDefault();
 
@@ -132,6 +260,7 @@
 
       // Initial load
       clearForm();
+      loadTree();
     })
   </script>
 @endpush

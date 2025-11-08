@@ -17,6 +17,8 @@
         href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.35.0/dist/tabler-icons.min.css" />
   <!-- CDN Notyf -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <!-- CDN jQuery Nestable (drag&drop) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.css">
   <!-- Custom CSS -->
   <link href="{{ asset('assets/admin/dist/css/tabler.css') }}" rel="stylesheet" />
   <!-- BEGIN CUSTOM FONT -->
@@ -79,6 +81,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- CDN Notyf JS -->
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<!-- CDN jQuery Nestable (drag&drop) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.js"></script>
 <!-- Custom JS -->
 <script src="{{ asset('assets/admin/dist/js/tabler.min.js') }}" defer></script>
 <!-- END GLOBAL MANDATORY SCRIPTS -->
