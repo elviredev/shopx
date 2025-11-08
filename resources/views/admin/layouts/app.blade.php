@@ -12,13 +12,13 @@
 
   <!-- JQuery Upload Preview -->
   <link rel="stylesheet" href="{{ asset('assets/global/upload-preview/upload-preview.css') }}">
-
   <!-- CDN Tabler Icons -->
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.35.0/dist/tabler-icons.min.css" />
+  <!-- CDN Notyf -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
   <!-- Custom CSS -->
   <link href="{{ asset('assets/admin/dist/css/tabler.css') }}" rel="stylesheet" />
-
   <!-- BEGIN CUSTOM FONT -->
   <style>
     @import url("https://rsms.me/inter/inter.css");
@@ -77,6 +77,8 @@
 <script src="{{ asset('assets/global/upload-preview/upload-preview.min.js') }}"></script>
 <!-- Sweetalert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- CDN Notyf JS -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <!-- Custom JS -->
 <script src="{{ asset('assets/admin/dist/js/tabler.min.js') }}" defer></script>
 <!-- END GLOBAL MANDATORY SCRIPTS -->

@@ -50,4 +50,19 @@
       });
     })
   })
+
+  /** Notyf init */
+  const notyf = new Notyf({
+    duration: 3000,
+    // types: [
+    //   {
+    //     type: 'success',
+    //     background: '#4CAF50',
+    //     icon: {
+    //       className: 'ti ti-check',
+    //       tagName: 'i',
+    //     }
+    //   }
+    // ]
+  });
 </script>

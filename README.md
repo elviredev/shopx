@@ -5,3 +5,4 @@
 - **Mailtrap** : Envoi de mail
 - **Spatie/laravel-permission** : Gestion des rôles et des permissions
 - **SweetAlert2** : Popup de confirmation 
+- **Notyf JS** : Notification des messages d'erreurs 
