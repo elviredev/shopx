@@ -89,6 +89,9 @@ Route::middleware('auth:admin')
   Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
   Route::get('/categories/nested', [CategoryController::class, 'getNestedCategories'])->name('categories.nested');
   Route::post('/categories/update-order', [CategoryController::class, 'updateOrder'])->name('categories.update-order');
+  Route::get('/categories/{id}', [CategoryController::class, 'show'])->name('categories.show');
+  Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+  Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
   /** Settings Routes */
   route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

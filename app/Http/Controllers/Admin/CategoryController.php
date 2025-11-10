@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,11 +13,20 @@ use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
+  /**
+   * @desc afficher page des catégories
+   * @return View
+   */
   public function index(): View
   {
     return view('admin.category.index');
   }
 
+  /**
+   * @desc enregistrer une catégorie en bdd
+   * @param Request $request
+   * @return JsonResponse
+   */
   public function store(Request $request)
   {
     // validate data
@@ -59,6 +68,60 @@ class CategoryController extends Controller
     ]);
   }
 
+  /**
+   * @desc Mettre à jour une catégorie en bdd
+   * @param Request $request
+   * @param int $id
+   * @return JsonResponse
+   */
+  public function update(Request $request, int $id)
+  {
+    // récupérer la category
+    $category = Category::findOrFail($id);
+
+    // validate data
+    $data = $request->validate([
+      'name' => ['required', 'string', 'max:255'],
+      'slug' => ['required', 'string', 'max:255', 'unique:categories,slug,' .$category->id],
+      'parent_id' => ['nullable', 'exists:categories,id'],
+      'is_active' => ['boolean'],
+    ]);
+
+    // prevent circular reference and max depth
+    if($data['parent_id'] ?? null) {
+      $parent = Category::find($data['parent_id']);
+      $depth = 1;
+
+      while($parent && $parent->parent_id) {
+        $depth++;
+        $parent = $parent->parent;
+        if($depth >= 3) break;
+      }
+
+      if($depth >= 3) {
+        throw ValidationException::withMessages([
+          'parent_id' => 'Maximum depth reached.'
+        ]);
+      }
+    }
+
+    $data['is_active'] = $data['is_active'] ?? false;
+
+    // mettre à jour la category
+    $category->update($data);
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Category updated successfully',
+      'category' => $category
+    ]);
+  }
+
+  /**
+   * @desc Mettre à jour la position des catégories en bdd
+   * @param Request $request
+   * @return JsonResponse
+   */
   public function updateOrder(Request $request)
   {
     $tree = $request->tree;
@@ -81,6 +144,12 @@ class CategoryController extends Controller
     }
   }
 
+  /**
+   * @desc Fonction récursive qui parcourt et met à jour chaque catégorie dans la structure arborescente
+   * @param $nodes
+   * @param $parentId
+   * @return void
+   */
   public function updateTree($nodes, $parentId)
   {
     foreach ($nodes as $position => $node) {
@@ -97,7 +166,38 @@ class CategoryController extends Controller
   }
 
   /**
-   * Retrieves nested categories and returns them as a JSON response.
+   * @desc Récupère la catégorie en fonction de son id et la retourne en tant que response JSON
+   * @param int $id
+   * @return JsonResponse
+   */
+  public function show(int $id)
+  {
+    $category = Category::findOrFail($id);
+    return response()->json($category);
+  }
+
+
+  public function destroy(int $id)
+  {
+    $category = Category::findOrFail($id);
+    // vérifier si la catégorie possède des enfants
+    if ($category->children()->count() > 0) {
+      return response()->json([
+        'error' => true,
+        'message' => 'Cannot delete category with children.'
+      ], 422);
+    }
+
+    $category->delete();
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Category deleted successfully.'
+    ]);
+  }
+
+  /**
+   * Récupère les catégories et sous-catégories et les retourne en tant que response JSON
    */
   public function getNestedCategories()
   {

@@ -49,6 +49,14 @@
       gap: 2px;
       flex: 1 1 auto;
     }
+
+    .dd-list .dd-list {
+      padding-left: 50px;
+    }
+
+    .dd-item-row {
+      margin-bottom: 5px;
+    }
   </style>
 @endpush
 
@@ -59,7 +67,7 @@
         <div class="card">
           <div class="card-header dflex justify-content-between align-items-center">
             <span>Categories</span>
-            <button class="btn btn-primary">New</button>
+            <button class="btn btn-primary" id="btn-new">New</button>
           </div>
           <div class="card-body">
             <!-- Category tree -->
@@ -78,10 +86,11 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-header">
-            <span>Create Category</span>
+            <span id="category-title">Create Category</span>
           </div>
           <div class="card-body">
             <form id="category-form" action="">
+              <input type="hidden" id="category-id" >
 
               <div class="form-group mb-2">
                 <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
@@ -108,7 +117,7 @@
 
               <div class="d-flex gap-2">
                 <button class="btn btn-primary" type="submit" id="btn-save">Save</button>
-                <button class="btn btn-danger" type="button" id="btn-delete">Delete</button>
+                <button class="btn btn-danger d-none" type="button" id="btn-delete">Delete</button>
                 <button class="btn btn-secondary" type="button" id="btn-cancel">Cancel</button>
               </div>
 
@@ -125,7 +134,7 @@
     $(function() {
 
       function loadTree() {
-        $('#tree-loading').show();
+        $('#tree-loading').removeClass('d-none');
 
         $.get("{{ route('admin.categories.nested') }}", function(data) {
           $('#category-tree').empty();
@@ -143,10 +152,12 @@
                 updateOrder();
               }
             });
-            $('#tree-loading').hide();
+
+          $('#tree-loading').addClass('d-none');
         })
       }
 
+      // afficher l'arborescence des catégories
       function renderTree(categories) {
         if(!categories.length) return;
         let html = '<ol class="dd-list" style="margin-bottom: 0;">';
@@ -175,6 +186,7 @@
         return html;
       }
 
+      // update order with drag & drop
       function updateOrder() {
         let tree = $('#nestable-tree').nestable('serialize');
         $.post({
@@ -194,11 +206,14 @@
         })
       }
 
+      // submit form
       $('#category-form').submit(function(e) {
         e.preventDefault();
-
-        let method = 'POST';
-        let url = '{{ route('admin.categories.store') }}';
+        let id = $('#category-id').val();
+        let method = id ? 'PUT' : 'POST';
+        let url = id
+          ? '{{ route('admin.categories.update', ':id') }}'.replace(':id', id)
+          : '{{ route('admin.categories.store') }}';
         let data = {
           name: $('#name').val(),
           slug: $('#slug').val(),
@@ -213,6 +228,7 @@
           data: data,
           success: function(response) {
             console.log(response);
+            loadTree();
             clearForm();
             notyf.success(response.message);
           },
@@ -249,14 +265,102 @@
         })
       }
 
+      // delete category
+      $('#btn-delete').click(function(e) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            let id = $('#category-id').val();
+            // requête AJAX
+            $.ajax({
+              url: "{{ route('admin.categories.destroy', ':id') }}".replace(':id', id),
+              method: "POST",
+              data: {
+                _token: '{{ csrf_token() }}',
+                _method: "DELETE"
+              },
+              success: function (response) {
+                if(response.success) {
+                  clearForm();
+                  loadTree();
+                  notyf.success(response.message);
+                }
+              },
+              error: function (xhr, status, error) {
+                if(xhr.responseJSON.error) {
+                  notyf.error(xhr.responseJSON.message);
+                }
+              }
+            }
+            )
+          }
+        });
+      })
+
+      // select category on click and show in form
+      $(document).off('click', '.cat-label').on('click', '.cat-label', function(e) {
+        e.stopPropagation();
+        let id = $(this).data('id');
+        $.get("{{ route('admin.categories.show', ':id') }}".replace(':id', id), function(cat) {
+          // définir les valeurs dans le form
+          fillForm(cat);
+        })
+      })
+
+      // slug auto-generate
+      $('#name').on('input', function() {
+        if(!$('#category-id').val()) {
+          $('#slug').val(slugify($(this).val()));
+        }
+      })
+
+      function slugify(text) {
+        return text.toString().toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9\-]/g, '')
+          .replace(/\-+/g, '-')
+          .replace(/^\-+|\-+$/g, '')
+      }
+
+      // fill form with category data
+      function fillForm(cat) {
+        $('#category-title').text('Edit Category');
+        $('#name').val(cat.name);
+        $('#slug').val(cat.slug);
+        $('#is_active').prop('checked', cat.is_active);
+        loadParentDropdown(cat.parent_id, cat.id);
+        $('#category-id').val(cat.id);
+        $('#btn-delete').removeClass('d-none');
+      }
+
       // clear form
       function clearForm() {
+        $('#category-title').text('Create Category');
         $('#name').val('');
         $('#slug').val('');
         $('#parent_id').val('');
         $('#is_active').prop('checked', true);
         loadParentDropdown(null, null);
+        $('#category-id').val('');
+        $('#btn-delete').addClass('d-none');
       }
+
+      // btn new
+      $('#btn-new').click(function(e) {
+        clearForm();
+      })
+
+      // btn-cancel
+      $('#btn-cancel').click(function(e) {
+        clearForm();
+      })
 
       // Initial load
       clearForm();
