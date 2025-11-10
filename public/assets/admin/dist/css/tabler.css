@@ -24923,3 +24923,9 @@ Antialiasing
 }
 
 /*# sourceMappingURL=tabler.css.map */
+
+/** Custom CSS */
+
+a i:hover {
+  color: var(--tblr-gray-600);
+}

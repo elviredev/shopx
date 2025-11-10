@@ -7,12 +7,26 @@ use App\Models\Category;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+  /**
+   * @desc Middleware pour vérifier l'autorisation d'accès aux méthodes du controller
+   * si user n'a pas la permission, il ne pourra pas accèder aux routes et vues du controller
+   * @return Middleware[]
+   */
+  static function Middleware(): array
+  {
+    return [
+      new Middleware('permission:Category Management')
+    ];
+  }
+
   /**
    * @desc afficher page des catégories
    * @return View
