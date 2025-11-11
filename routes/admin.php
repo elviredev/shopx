@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Admin\Auth\NewPasswordController;
 use App\Http\Controllers\Admin\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Admin\Auth\VerifyEmailController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\KycRequestController;
@@ -96,6 +97,9 @@ Route::middleware('auth:admin')
 
   /** Tags Routes */
   route::resource('/tags', TagController::class);
+
+  /** Brands Routes */
+  route::resource('/brands', BrandController::class);
 
   /** Settings Routes */
   route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

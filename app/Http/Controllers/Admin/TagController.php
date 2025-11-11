@@ -21,7 +21,7 @@ class TagController extends Controller implements HasMiddleware
   static function Middleware(): array
   {
     return [
-      new Middleware('permission:Category Management')
+      new Middleware('permission:Tags Management')
     ];
   }
 
