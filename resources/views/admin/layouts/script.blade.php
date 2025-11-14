@@ -14,6 +14,21 @@
     content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
   });
 
+  /** tinymce init pour product short description */
+  tinymce.init({
+    selector: 'textarea#short-editor',
+    height: 300,
+    plugins: [
+      'advlist', 'lists', 'link', 'image', 'charmap', 'preview',
+      'code', 'fullscreen', 'table', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | ' +
+      'bold italic backcolor | alignleft aligncenter ' +
+      'alignright alignjustify | bullist numlist outdent indent | ' +
+      'removeformat | help',
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+  });
+
   /** sweetalert2 init */
   $(function () {
     $('.delete-item').on('click', function (e) {
@@ -53,16 +68,12 @@
 
   /** Notyf init */
   const notyf = new Notyf({
-    duration: 3000,
-    // types: [
-    //   {
-    //     type: 'success',
-    //     background: '#4CAF50',
-    //     icon: {
-    //       className: 'ti ti-check',
-    //       tagName: 'i',
-    //     }
-    //   }
-    // ]
+    duration: 3000
   });
+
+  /** Select2 init */
+  $(document).ready(function() {
+    $('.select2').select2();
+  });
+
 </script>

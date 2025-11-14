@@ -7,3 +7,4 @@
 - **SweetAlert2** : Popup de confirmation 
 - **Notyf JS** : Notification des messages d'erreurs 
 - **Jquery Nestable 2** : Drag & Drop
+- **Select2** : Fonction de recherche dans une liste déroulante

@@ -57,12 +57,20 @@
             aria-expanded="false"
           >
             <span class="nav-link-icon d-md-none d-lg-inline-block">
-              <i class="ti ti-shield"></i>
+              <i class="ti ti-brand-shopee"></i>
             </span>
             <span class="nav-link-title"> Ecommerce </span>
           </a>
           <div class="dropdown-menu">
             <div class="dropdown-menu-columns">
+              @if(hasPermission(['Category Management']))
+                <div class="dropdown-menu-column">
+                  <a class="dropdown-item" href="{{ route('admin.products.index') }}">
+                    Products
+                  </a>
+                </div>
+              @endif
+
               @if(hasPermission(['Category Management']))
                 <div class="dropdown-menu-column">
                   <a class="dropdown-item" href="{{ route('admin.categories.index') }}">
