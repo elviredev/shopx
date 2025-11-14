@@ -76,4 +76,20 @@
     $('.select2').select2();
   });
 
+  /** Litepicker init */
+  document.addEventListener("DOMContentLoaded", function () {
+
+    if(window.Litepicker) {
+      document.querySelectorAll('.datepicker').forEach(function(el) {
+        new Litepicker({
+          element: el,
+          buttonText: {
+            previousMonth: `<i class="ti ti-chevron-left fs-2"></i>`,
+            nextMonth: `<i class="ti ti-chevron-right fs-2"></i>`,
+          },
+        });
+      })
+    }
+  });
+
 </script>

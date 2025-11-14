@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LaravelIdea\Helper\App\Models\_IH_Category_C;
 
@@ -44,5 +45,10 @@ class Category extends Model
     }
 
     return $categories;
+  }
+
+  public function products(): BelongsToMany
+  {
+    return $this->belongsToMany(Product::class);
   }
 }

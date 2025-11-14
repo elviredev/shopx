@@ -105,6 +105,7 @@ Route::middleware('auth:admin')
   /** Products Routes */
   Route::get('/products', [ProductController::class, 'index'])->name('products.index');
   Route::get('/products/physical/create', [ProductController::class, 'create'])->name('products.create');
+  Route::post('/products/physical/create', [ProductController::class, 'store'])->name('products.store');
 
 
   /** Settings Routes */

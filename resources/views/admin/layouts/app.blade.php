@@ -87,6 +87,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.js"></script>
 <!-- CDN Select2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- Litepicker -->
+<script src="{{ asset('assets/admin/dist/libs/litepicker/dist/litepicker.js') }}" defer></script>
 <!-- Custom JS -->
 <script src="{{ asset('assets/admin/dist/js/tabler.min.js') }}" defer></script>
 <!-- END GLOBAL MANDATORY SCRIPTS -->

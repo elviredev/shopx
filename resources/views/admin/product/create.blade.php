@@ -2,145 +2,149 @@
 
 @section('contents')
 <div class="container-xl">
-  <div class="row">
-    <div class="col-md-8">
-      <div class="card mb-3">
-{{--          <div class="card-header">--}}
-{{--            <h3 class="card-title">Create Role</h3>--}}
-{{--            <div class="card-actions">--}}
-{{--              <a href="{{ route('admin.role.index') }}" class="btn btn-secondary">Back</a>--}}
-{{--            </div>--}}
-{{--          </div>--}}
-        <div class="card-body">
 
-          <div class="col-md-12">
-            <div class="mb-3">
-              <label class="form-label required">Name</label>
-              <input type="text" class="form-control" name="name">
-              <x-input-error :messages="$errors->get('name')" />
+  <form action="" class="product-form">
+    @csrf
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-3">
+  {{--          <div class="card-header">--}}
+  {{--            <h3 class="card-title">Create Role</h3>--}}
+  {{--            <div class="card-actions">--}}
+  {{--              <a href="{{ route('admin.role.index') }}" class="btn btn-secondary">Back</a>--}}
+  {{--            </div>--}}
+  {{--          </div>--}}
+          <div class="card-body">
+
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label class="form-label required">Name</label>
+                <input type="text" class="form-control" name="name">
+                <x-input-error :messages="$errors->get('name')" />
+              </div>
             </div>
-          </div>
 
-          <div class="col-md-12">
-            <div class="mb-3">
-              <label class="form-label required">Slug</label>
-              <input type="text" class="form-control" name="slug">
-              <x-input-error :messages="$errors->get('slug')" />
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label class="form-label required">Slug</label>
+                <input type="text" class="form-control" name="slug">
+                <x-input-error :messages="$errors->get('slug')" />
+              </div>
             </div>
-          </div>
 
-          <div class="col-md-12">
-            <div class="mb-3">
-              <label class="form-label required">Short description</label>
-              <textarea name="short_description" id="short-editor" ></textarea>
-              <x-input-error :messages="$errors->get('short_description')" />
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label class="form-label required">Short description</label>
+                <textarea name="short_description" id="short-editor" ></textarea>
+                <x-input-error :messages="$errors->get('short_description')" />
+              </div>
             </div>
-          </div>
 
-          <div class="col-md-12">
-            <div class="mb-3">
-              <label class="form-label required">Content</label>
-              <textarea name="content" id="editor" ></textarea>
-              <x-input-error :messages="$errors->get('content')" />
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label class="form-label required">Content</label>
+                <textarea name="description" id="editor" ></textarea>
+                <x-input-error :messages="$errors->get('description')" />
+              </div>
             </div>
-          </div>
 
+          </div>
         </div>
-      </div>
 
-      <!--- Overview -->
-      <div class="card">
-        <div class="card-header">Overview</div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label">SKU</label>
-                <input type="text" class="form-control" name="" value="">
-                <x-input-error :messages="$errors->get('store')" />
-              </div>
-            </div>
-
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label">Price</label>
-                <input type="text" class="form-control" name="" value="">
-                <x-input-error :messages="$errors->get('store')" />
-              </div>
-            </div>
-
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label">Special Price</label>
-                <input type="text" class="form-control" name="" value="">
-                <x-input-error :messages="$errors->get('store')" />
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">From date</label>
-                <input type="text" class="form-control" name="" value="">
-                <x-input-error :messages="$errors->get('store')" />
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">To Date</label>
-                <input type="text" class="form-control" name="" value="">
-                <x-input-error :messages="$errors->get('store')" />
-              </div>
-            </div>
-
+        <!--- Overview -->
+        <div class="card">
+          <div class="card-header">Overview</div>
+          <div class="card-body">
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-md-4">
                 <div class="mb-3">
-                  <label class="form-check">
-                    <input type="checkbox" class="form-check-input">
-                    <span class="form-check-label">Manage Stock</span>
-                  </label>
+                  <label class="form-label">SKU</label>
+                  <input type="text" class="form-control" name="sku" value="">
+                  <x-input-error :messages="$errors->get('sku')" />
                 </div>
               </div>
 
-              <div class="col-md-12">
+              <div class="col-md-4">
                 <div class="mb-3">
-                  <label class="form-label">Quantity</label>
-                  <input type="text" class="form-control" name="" value="">
-                  <x-input-error :messages="$errors->get('store')" />
+                  <label class="form-label">Price</label>
+                  <input type="text" class="form-control" name="price" value="">
+                  <x-input-error :messages="$errors->get('price')" />
                 </div>
               </div>
-            </div>
 
-            <div class="row">
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Stock Status</h3>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Special Price</label>
+                  <input type="text" class="form-control" name="special_price" value="">
+                  <x-input-error :messages="$errors->get('special_price')" />
                 </div>
-                <div class="card-body">
-                  <div class="col-md-12">
-                    <div class="mb-3">
-                      <label class="form-check">
-                        <input type="radio" name="radios" class="form-check-input" checked="">
-                        <span class="form-check-label">In Stock</span>
-                      </label>
-                      <label class="form-check">
-                        <input type="radio" name="radios" class="form-check-input" checked="">
-                        <span class="form-check-label">Out Stock</span>
-                      </label>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">From date</label>
+                  <input type="text" class="form-control datepicker" name="from_date" value="" >
+                  <x-input-error :messages="$errors->get('from_date')" />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">To Date</label>
+                  <input type="text" class="form-control datepicker" name="to_date" value="">
+                  <x-input-error :messages="$errors->get('to_date')" />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-check">
+                      <input type="checkbox" class="form-check-input manage-stock-check" name="manage_stock">
+                      <span class="form-check-label">Manage Stock</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="col-md-12 manage-stock d-none">
+                  <div class="mb-3">
+                    <label class="form-label">Quantity</label>
+                    <input type="text" class="form-control" name="quantity" value="">
+                    <x-input-error :messages="$errors->get('quantity')" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Stock Status</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="col-md-12">
+                      <div class="mb-3">
+                        <label class="form-check">
+                          <input type="radio" name="stock_status" class="form-check-input" checked="" value="in_stock">
+                          <span class="form-check-label">In Stock</span>
+                        </label>
+                        <label class="form-check">
+                          <input type="radio" name="stock_status" class="form-check-input" checked="" value="out_of_stock">
+                          <span class="form-check-label">Out Stock</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!--- Options -->
-    <div class="col-md-4">
+      <!--- Options -->
+      <div class="col-md-4">
       <div class="card mb-3">
         <div class="card-header">
           <h3 class="card-title">Status</h3>
@@ -149,7 +153,8 @@
           <div class="col-md-12">
             <div class="mb-3">
               <select name="status" class="form-select" id="">
-                <option value="published">Published</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
                 <option value="draft">Draft</option>
                 <option value="pending">Pending</option>
               </select>
@@ -186,7 +191,7 @@
           <div class="col-md-12">
             <div class="mb-3">
               <label class="form-check form-switch form-switch-3">
-                <input class="form-check-input" type="checkbox">
+                <input class="form-check-input" type="checkbox" name="is_featured">
                 <span class="form-check-label">Enable</span>
               </label>
               <x-input-error :messages="$errors->get('is_featured')" />
@@ -199,22 +204,21 @@
           <div class="card-header">
             <h3 class="card-title">Categories</h3>
           </div>
-          <div class="card-body">
+          <div class="card-body" style="height: 400px; overflow-y: scroll;">
             <div class="col-md-12">
               <div class="mb-3">
-{{--                <select name="category" class="form-select" id="">--}}
-{{--                  <option value="">Select a category</option>--}}
-{{--                </select>--}}
-{{--                <x-input-error :messages="$errors->get('category')" />--}}
+                <div class="mb-3">
+                  <input type="text" class="form-control" id="category-search" placeholder="Search category">
+                </div>
 
                 <!-- Listes Imbriquées -->
-                <ul class="list-unstyled">
+                <ul class="list-unstyled" id="category-tree">
                   <!-- Categorie -->
                   @foreach($categories as $category)
                     <li>
                     <label for="" class="form-check category-wrapper">
-                      <input type="checkbox" class="form-check-input category-check">
-                      <span class="form-check-label">{{ $category->name }}</span>
+                      <input type="checkbox" class="form-check-input category-check" name="categories[]" value="{{ $category->id }}">
+                      <span class="form-check-label category-label">{{ $category->name }}</span>
                     </label>
 
                     <!-- Sous-Categorie -->
@@ -223,8 +227,8 @@
                       @foreach($category->children_nested as $child)
                       <li>
                         <label for="" class="form-check category-wrapper">
-                          <input type="checkbox" class="form-check-input category-check">
-                          <span class="form-check-label">{{ $child->name }}</span>
+                          <input type="checkbox" class="form-check-input category-check" name="categories[]" value="{{ $child->id }}">
+                          <span class="form-check-label category-label">{{ $child->name }}</span>
                         </label>
 
                         <!--- Sous-Sous-Categorie -->
@@ -233,8 +237,8 @@
                           @foreach($child->children_nested as $subChild)
                           <li>
                             <label for="" class="form-check category-wrapper">
-                              <input type="checkbox" class="form-check-input category-check">
-                              <span class="form-check-label">{{ $subChild->name }}</span>
+                              <input type="checkbox" class="form-check-input category-check" name="categories[]" value="{{ $subChild->id }}">
+                              <span class="form-check-label category-label">{{ $subChild->name }}</span>
                             </label>
                           </li>
                           @endforeach
@@ -279,11 +283,11 @@
             <div class="col-md-12">
               <div class="mb-3">
                 <label class="form-check">
-                  <input class="form-check-input" type="checkbox">
+                  <input class="form-check-input" type="checkbox" name="is_hot">
                   <span class="form-check-label">Hot</span>
                 </label>
                 <label class="form-check">
-                  <input class="form-check-input" type="checkbox">
+                  <input class="form-check-input" type="checkbox" name="is_new">
                   <span class="form-check-label">New</span>
                 </label>
                 <x-input-error :messages="$errors->get('brand')" />
@@ -299,12 +303,12 @@
           <div class="card-body">
             <div class="col-md-12">
               <div class="mb-3">
-                <select name="tag" class="form-select select2" id="" multiple="multiple">
+                <select name="tags[]" class="form-select select2" id="" multiple="multiple">
                   @foreach($tags as $tag)
                     <option value="{{ $tag->id }}">{{ $tag->name }}</option>
                   @endforeach
                 </select>
-                <x-input-error :messages="$errors->get('tag')" />
+                <x-input-error :messages="$errors->get('tags')" />
               </div>
             </div>
           </div>
@@ -314,19 +318,22 @@
           <div class="card-body">
             <div class="col-md-12">
               <div class="mb-3 row">
-                <button class="btn btn-primary mt-3" onclick="$('#roleForm').submit()">Create</button>
+                <button type="submit" class="btn btn-primary mt-3">Create</button>
               </div>
             </div>
           </div>
         </div>
 
       </div>
-  </div>
+    </div>
+  </form>
+
 </div>
 @endsection
 
 @push('scripts')
   <script>
+    // handle checkbox change event
     $(document).on('change', '.category-check', function() {
       // return true if checked, false if unchecked
       const isChecked = $(this).is(':checked');
@@ -365,7 +372,67 @@
       }
 
       updateParents($(this));
-
     })
+
+    // Fonction de recherche d'une catégorie
+    $('#category-search').on('input', function() {
+      const query = $(this).val().toLowerCase();
+
+      $('#category-tree li').each(function() {
+        const label = $(this).find('> label > .category-label').text().toLowerCase();
+        if (label.includes(query)) {
+          $(this).removeClass('d-none');
+          // show all ancestors of the matched category
+          $(this).parents('li').removeClass('d-none');
+        } else {
+          $(this).addClass('d-none');
+        }
+      })
+
+      // if query is empty, show all categories
+      if (query === '') {
+        $('#category-tree li').removeClass('d-none');
+      }
+    })
+
+    // Manage stock checkbox - Quantity input is hidden when manage stock is unchecked
+    $('.manage-stock-check').on('change', function() {
+      if ($(this).is(':checked')) {
+        $('.manage-stock').removeClass('d-none');
+      } else {
+        $('.manage-stock').addClass('d-none');
+      }
+    })
+
+    // Submit Form
+    $(function() {
+      $('.product-form').on('submit', function (e) {
+        e.preventDefault();
+
+        let form = $(this);
+        let data = new FormData(form[0]);
+
+        // Ajax Request
+        $.ajax({
+          method: "POST",
+          url: '{{ route('admin.products.store') }}',
+          data: data,
+          contentType: false,
+          processData: false,
+          success: function (response) {
+            console.log(response);
+          },
+          error: function (xhr, status, error) {
+            console.log(xhr);
+            let errors = xhr.responseJSON.errors;
+            $.each(errors, function (key, value) {
+              notyf.error(errors[key][0]);
+            })
+          }
+        })
+
+      })
+    })
+
   </script>
 @endpush
