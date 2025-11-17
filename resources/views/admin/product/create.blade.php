@@ -1,5 +1,85 @@
 @extends('admin.layouts.app')
 
+@push('styles')
+  <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
+  <style>
+    .dropzone {
+      border: 2px dashed #ccc;
+      border-radius: 4px;
+      padding: 20px;
+      text-align: center;
+      background: #f8f9fa;
+      margin-bottom: 20px;
+    }
+
+    .dropzone.dz-drag-hover {
+      border-color: #2196F3;
+      background: #e3f2fd;
+    }
+
+    .image-preview-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .image-preview-item {
+      position: relative;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: move;
+    }
+
+    .image-preview-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .image-preview-item .remove-image {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      text-align: center;
+      line-height: 24px;
+      cursor: pointer;
+    }
+
+    .image-preview-loader {
+      position: relative;
+      width: 100%;
+      height: 150px;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 1.5s infinite;
+    }
+
+    .image-preview-loader::after {
+      content: "Uploading...";
+      color: #666;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+  </style>
+@endpush
+
 @section('contents')
 <div class="container-xl">
 
@@ -117,7 +197,7 @@
               </div>
 
               <div class="row">
-                <div class="card">
+                <div class="card mb-3">
                   <div class="card-header">
                     <h3 class="card-title">Stock Status</h3>
                   </div>
@@ -136,11 +216,13 @@
                     </div>
                   </div>
                 </div>
+
               </div>
 
             </div>
           </div>
         </div>
+
       </div>
 
       <!--- Options -->
@@ -332,107 +414,114 @@
 @endsection
 
 @push('scripts')
-  <script>
-    // handle checkbox change event
-    $(document).on('change', '.category-check', function() {
-      // return true if checked, false if unchecked
-      const isChecked = $(this).is(':checked');
+{{-- CDN Dropzone --}}
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+{{-- CDN SortableJS --}}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
 
+<script>
+  // handle checkbox change event
+  $(document).on('change', '.category-check', function() {
+    // return true if checked, false if unchecked
+    const isChecked = $(this).is(':checked');
+
+    // get the parent "li" of the checkbox
+    $(this).closest('li').find('input.category-check').each(function() {
+      // check or uncheck the child checkbox based on the parent checkbox's state
+      this.checked = isChecked;
+      this.indeterminate = false;
+    })
+
+    function updateParents($input) {
       // get the parent "li" of the checkbox
-      $(this).closest('li').find('input.category-check').each(function() {
-        // check or uncheck the child checkbox based on the parent checkbox's state
-        this.checked = isChecked;
-        this.indeterminate = false;
-      })
+      const $li = $input.closest('li').parent().closest('li');
 
-      function updateParents($input) {
-        // get the parent "li" of the checkbox
-        const $li = $input.closest('li').parent().closest('li');
+      if ($li.length) {
+        // get all child checkboxes within the parent "li"
+        const $siblings = $li.find('> ul > li input.category-check');
+        // nb de checkboxes cochées dans le parent "li"
+        const $checkedCount = $siblings.filter(':checked').length;
+        // select les autres parents dans le li principal
+        const $parent = $li.find('> label > input.category-check');
 
-        if ($li.length) {
-          // get all child checkboxes within the parent "li"
-          const $siblings = $li.find('> ul > li input.category-check');
-          // nb de checkboxes cochées dans le parent "li"
-          const $checkedCount = $siblings.filter(':checked').length;
-          // select les autres parents dans le li principal
-          const $parent = $li.find('> label > input.category-check');
-
-          if ($checkedCount === 0) {
-            // si aucun enfant n'est coché, le parent sera décoché
-            $parent.prop('checked', false).prop('indeterminate', false);
-          } else if($checkedCount === $siblings.length) {
-            // si tous les enfants cochés, le parent sera coché
-            $parent.prop('checked', true).prop('indeterminate', false);
-          } else {
-            $parent.prop('checked', false).prop('indeterminate', true);
-          }
-
-          updateParents($parent);
-        }
-      }
-
-      updateParents($(this));
-    })
-
-    // Fonction de recherche d'une catégorie
-    $('#category-search').on('input', function() {
-      const query = $(this).val().toLowerCase();
-
-      $('#category-tree li').each(function() {
-        const label = $(this).find('> label > .category-label').text().toLowerCase();
-        if (label.includes(query)) {
-          $(this).removeClass('d-none');
-          // show all ancestors of the matched category
-          $(this).parents('li').removeClass('d-none');
+        if ($checkedCount === 0) {
+          // si aucun enfant n'est coché, le parent sera décoché
+          $parent.prop('checked', false).prop('indeterminate', false);
+        } else if($checkedCount === $siblings.length) {
+          // si tous les enfants cochés, le parent sera coché
+          $parent.prop('checked', true).prop('indeterminate', false);
         } else {
-          $(this).addClass('d-none');
+          $parent.prop('checked', false).prop('indeterminate', true);
+        }
+
+        updateParents($parent);
+      }
+    }
+
+    updateParents($(this));
+  })
+
+  // Fonction de recherche d'une catégorie
+  $('#category-search').on('input', function() {
+    const query = $(this).val().toLowerCase();
+
+    $('#category-tree li').each(function() {
+      const label = $(this).find('> label > .category-label').text().toLowerCase();
+      if (label.includes(query)) {
+        $(this).removeClass('d-none');
+        // show all ancestors of the matched category
+        $(this).parents('li').removeClass('d-none');
+      } else {
+        $(this).addClass('d-none');
+      }
+    })
+
+    // if query is empty, show all categories
+    if (query === '') {
+      $('#category-tree li').removeClass('d-none');
+    }
+  })
+
+  // Manage stock checkbox - Quantity input is hidden when manage stock is unchecked
+  $('.manage-stock-check').on('change', function() {
+    if ($(this).is(':checked')) {
+      $('.manage-stock').removeClass('d-none');
+    } else {
+      $('.manage-stock').addClass('d-none');
+    }
+  })
+
+  // Submit Form
+  $(function() {
+    $('.product-form').on('submit', function (e) {
+      e.preventDefault();
+
+      let form = $(this);
+      let data = new FormData(form[0]);
+
+      // Ajax Request
+      $.ajax({
+        method: "POST",
+        url: "{{ route('admin.products.store') }}",
+        data: data,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          if(response.status === 'success') {
+            window.location.href = "{{ route('admin.products.edit', ':id') }}" .replace(':id', response.id);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.log(xhr);
+          let errors = xhr.responseJSON.errors;
+          $.each(errors, function (key, value) {
+            notyf.error(errors[key][0]);
+          })
         }
       })
 
-      // if query is empty, show all categories
-      if (query === '') {
-        $('#category-tree li').removeClass('d-none');
-      }
     })
+  })
 
-    // Manage stock checkbox - Quantity input is hidden when manage stock is unchecked
-    $('.manage-stock-check').on('change', function() {
-      if ($(this).is(':checked')) {
-        $('.manage-stock').removeClass('d-none');
-      } else {
-        $('.manage-stock').addClass('d-none');
-      }
-    })
-
-    // Submit Form
-    $(function() {
-      $('.product-form').on('submit', function (e) {
-        e.preventDefault();
-
-        let form = $(this);
-        let data = new FormData(form[0]);
-
-        // Ajax Request
-        $.ajax({
-          method: "POST",
-          url: '{{ route('admin.products.store') }}',
-          data: data,
-          contentType: false,
-          processData: false,
-          success: function (response) {
-            console.log(response);
-          },
-          error: function (xhr, status, error) {
-            console.log(xhr);
-            let errors = xhr.responseJSON.errors;
-            $.each(errors, function (key, value) {
-              notyf.error(errors[key][0]);
-            })
-          }
-        })
-
-      })
-    })
-
-  </script>
+</script>
 @endpush

@@ -7,14 +7,18 @@ use App\Http\Requests\Admin\ProductStoreRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Store;
 use App\Models\Tag;
 use App\Services\AlertService;
+use App\Traits\FileUploadTrait;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+  use FileUploadTrait;
+
   public function index(): View
   {
     return view('admin.product.index');
@@ -60,8 +64,62 @@ class ProductController extends Controller
     $product->tags()->sync($request->tags);
 
     return response()->json([
+      'id' => $product->id,
       'status' => 'success',
       'message' => 'Product created successfully.'
     ]);
+  }
+
+  public function edit(int $id)
+  {
+    $product = Product::findOrFail($id);
+    $stores = Store::select(['id', 'name'])->get();
+    $brands = Brand::select(['id', 'name'])->where('is_active', 1)->get();
+    $tags = Tag::where('is_active', 1)->get();
+    $categories = Category::getNested();
+
+    return view('admin.product.edit', compact('stores', 'brands', 'tags', 'categories', 'product'));
+  }
+
+  public function uploadImages(Request $request, Product $product)
+  {
+    $request->validate([
+      'image' => [ 'required', 'image', 'max:2048']
+    ]);
+
+    $imagePath = $this->uploadFile($request->file('image'));
+
+    $productImage = new ProductImage();
+    $productImage->product_id = $product->id;
+    $productImage->path = $imagePath;
+    $productImage->order = ProductImage::where('product_id', $product->id)->max('order') + $product->id;
+    $productImage->save();
+
+    return response()->json([
+      'status' => 'success',
+      'id' => $productImage->id,
+      'path' => asset($imagePath),
+      'message' => 'Image uploaded successfully.'
+    ]);
+  }
+
+  public function destroyImage(int $id)
+  {
+    $image = ProductImage::findOrFail($id);
+    $this->deleteFile($image->path);
+    $image->delete();
+
+    return response()->json([
+      'status' => 'success',
+      'message' => 'Image deleted successfully.'
+    ]);
+  }
+
+  public function reorderImages(Request $request)
+  {
+    foreach ($request->images as $image) {
+      // Mettre à jour l'ordre de l'image
+      ProductImage::where('id', $image['id'])->update(['order' => $image['order']]);
+    }
   }
 }

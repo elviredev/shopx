@@ -23,17 +23,20 @@ trait FileUploadTrait
 
     $ignorePath = ['/default/avatar.png', '/default/banner.png', '/default/shop.png'];
 
+    // supprimer l'ancien fichier s'il existe
     if ($oldPath && File::exists(public_path($oldPath)) && !in_array($oldPath, $ignorePath)) {
       File::delete(public_path($oldPath));
     }
 
     $folderPath = public_path($path);
-    // s'assurer que le dossier existe
+    // s'assurer que le dossier existe sinon le créé (/public/uploads)
     if (!file_exists($folderPath)) {
       mkdir($folderPath, 0755, true);
     }
 
+    // générer un nom unique
     $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+    // déplacer le fichier vers le dossier uploads
     $file->move($folderPath, $filename);
 
     return $path . '/' . $filename;

@@ -8,3 +8,5 @@
 - **Notyf JS** : Notification des messages d'erreurs 
 - **Jquery Nestable 2** : Drag & Drop
 - **Select2** : Fonction de recherche dans une liste déroulante
+- **Dropzone JS** : Upload de fichiers
+- **SortableJS** : Tri des images - Drag & Drop
