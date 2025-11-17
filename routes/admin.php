@@ -107,6 +107,7 @@ Route::middleware('auth:admin')
   Route::get('/products/physical/create', [ProductController::class, 'create'])->name('products.create');
   Route::post('/products/physical/create', [ProductController::class, 'store'])->name('products.store');
   Route::get('/products/physical/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+  Route::post('/products/physical/{product}/update', [ProductController::class, 'update'])->name('products.update');
   Route::post('/products/images/upload/{product}', [ProductController::class, 'uploadImages'])->name('products.images.upload');
   Route::delete('/products/images/{image}', [ProductController::class, 'destroyImage'])->name('products.images.destroy');
   Route::post('/products/images/reorder', [ProductController::class, 'reorderImages'])->name('products.images.reorder');

@@ -508,7 +508,7 @@
         processData: false,
         success: function (response) {
           if(response.status === 'success') {
-            window.location.href = "{{ route('admin.products.edit', ':id') }}" .replace(':id', response.id);
+            window.location.href = response.redirect_url
           }
         },
         error: function (xhr, status, error) {

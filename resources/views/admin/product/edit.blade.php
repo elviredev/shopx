@@ -100,7 +100,7 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Name</label>
-                  <input type="text" class="form-control" name="name">
+                  <input type="text" class="form-control" name="name" value="{{ $product->name }}">
                   <x-input-error :messages="$errors->get('name')" />
                 </div>
               </div>
@@ -108,7 +108,7 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Slug</label>
-                  <input type="text" class="form-control" name="slug">
+                  <input type="text" class="form-control" name="slug" value="{{ $product->slug }}">
                   <x-input-error :messages="$errors->get('slug')" />
                 </div>
               </div>
@@ -116,7 +116,7 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Short description</label>
-                  <textarea name="short_description" id="short-editor" ></textarea>
+                  <textarea name="short_description" id="short-editor" >{!! $product->short_description !!}</textarea>
                   <x-input-error :messages="$errors->get('short_description')" />
                 </div>
               </div>
@@ -124,7 +124,7 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Content</label>
-                  <textarea name="description" id="editor" ></textarea>
+                  <textarea name="description" id="editor" >{!! $product->description !!}</textarea>
                   <x-input-error :messages="$errors->get('description')" />
                 </div>
               </div>
@@ -140,7 +140,7 @@
                 <div class="col-md-4">
                   <div class="mb-3">
                     <label class="form-label">SKU</label>
-                    <input type="text" class="form-control" name="sku" value="">
+                    <input type="text" class="form-control" name="sku" value="{{ $product->sku }}">
                     <x-input-error :messages="$errors->get('sku')" />
                   </div>
                 </div>
@@ -148,7 +148,7 @@
                 <div class="col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Price</label>
-                    <input type="text" class="form-control" name="price" value="">
+                    <input type="text" class="form-control" name="price" value="{{ $product->price }}">
                     <x-input-error :messages="$errors->get('price')" />
                   </div>
                 </div>
@@ -156,7 +156,7 @@
                 <div class="col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Special Price</label>
-                    <input type="text" class="form-control" name="special_price" value="">
+                    <input type="text" class="form-control" name="special_price" value="{{ $product->special_price }}">
                     <x-input-error :messages="$errors->get('special_price')" />
                   </div>
                 </div>
@@ -164,7 +164,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label">From date</label>
-                    <input type="text" class="form-control datepicker" name="from_date" value="" >
+                    <input type="text" class="form-control datepicker" name="from_date" value="{{ $product->special_price_start }}" >
                     <x-input-error :messages="$errors->get('from_date')" />
                   </div>
                 </div>
@@ -172,7 +172,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label">To Date</label>
-                    <input type="text" class="form-control datepicker" name="to_date" value="">
+                    <input type="text" class="form-control datepicker" name="to_date" value="{{ $product->special_price_end }}">
                     <x-input-error :messages="$errors->get('to_date')" />
                   </div>
                 </div>
@@ -181,16 +181,16 @@
                   <div class="col-md-12">
                     <div class="mb-3">
                       <label class="form-check">
-                        <input type="checkbox" class="form-check-input manage-stock-check" name="manage_stock">
+                        <input type="checkbox" class="form-check-input manage-stock-check" name="manage_stock" @checked($product->manage_stock == 'yes')>
                         <span class="form-check-label">Manage Stock</span>
                       </label>
                     </div>
                   </div>
 
-                  <div class="col-md-12 manage-stock d-none">
+                  <div class="col-md-12 manage-stock {{ $product->manage_stock == 'yes' ? '' : 'd-none' }}">
                     <div class="mb-3">
                       <label class="form-label">Quantity</label>
-                      <input type="text" class="form-control" name="quantity" value="">
+                      <input type="text" class="form-control" name="quantity" value="{{ $product->qty }}">
                       <x-input-error :messages="$errors->get('quantity')" />
                     </div>
                   </div>
@@ -205,11 +205,11 @@
                       <div class="col-md-12">
                         <div class="mb-3">
                           <label class="form-check">
-                            <input type="radio" name="stock_status" class="form-check-input" checked="" value="in_stock">
+                            <input type="radio" name="stock_status" class="form-check-input" @checked($product->in_stock == 1)  value="in_stock">
                             <span class="form-check-label">In Stock</span>
                           </label>
                           <label class="form-check">
-                            <input type="radio" name="stock_status" class="form-check-input" checked="" value="out_of_stock">
+                            <input type="radio" name="stock_status" class="form-check-input" @checked($product->in_stock == 0)  value="out_of_stock">
                             <span class="form-check-label">Out Stock</span>
                           </label>
                         </div>
@@ -223,7 +223,7 @@
             </div>
           </div>
 
-          <div class="card mt-3">
+          <div class="card mt-3" id="product-images">
             <div class="card-header">
               <h3 class="card-title">Product Image</h3>
             </div>
@@ -255,10 +255,10 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <select name="status" class="form-select" id="">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="draft">Draft</option>
-                    <option value="pending">Pending</option>
+                    <option @selected($product->status == 'active') value="active">Active</option>
+                    <option @selected($product->status == 'inactive') value="inactive">Inactive</option>
+                    <option @selected($product->status == 'draft') value="draft">Draft</option>
+                    <option @selected($product->status == 'pending') value="pending">Pending</option>
                   </select>
                   <x-input-error :messages="$errors->get('status')" />
                 </div>
@@ -276,7 +276,7 @@
                   <select name="store" class="form-select select2" id="">
                     <option value="">Select a store</option>
                     @foreach($stores as $store)
-                      <option value="{{ $store->id }}">{{ $store->name }}</option>
+                      <option @selected($product->store_id == $store->id) value="{{ $store->id }}">{{ $store->name }}</option>
                     @endforeach
                   </select>
                   <x-input-error :messages="$errors->get('store')" />
@@ -293,7 +293,7 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-check form-switch form-switch-3">
-                    <input class="form-check-input" type="checkbox" name="is_featured">
+                    <input class="form-check-input" type="checkbox" @checked($product->is_featured == 1) name="is_featured">
                     <span class="form-check-label">Enable</span>
                   </label>
                   <x-input-error :messages="$errors->get('is_featured')" />
@@ -319,7 +319,12 @@
                     @foreach($categories as $category)
                       <li>
                         <label for="" class="form-check category-wrapper">
-                          <input type="checkbox" class="form-check-input category-check" name="categories[]" value="{{ $category->id }}">
+                          <input
+                            type="checkbox" class="form-check-input category-check"
+                             name="categories[]"
+                             value="{{ $category->id }}"
+                             @checked(in_array($category->id, $productCategoryIds ))
+                          >
                           <span class="form-check-label category-label">{{ $category->name }}</span>
                         </label>
 
@@ -329,7 +334,13 @@
                             @foreach($category->children_nested as $child)
                               <li>
                                 <label for="" class="form-check category-wrapper">
-                                  <input type="checkbox" class="form-check-input category-check" name="categories[]" value="{{ $child->id }}">
+                                  <input
+                                    type="checkbox"
+                                    class="form-check-input category-check"
+                                    name="categories[]"
+                                    value="{{ $child->id }}"
+                                    @checked(in_array($child->id, $productCategoryIds ))
+                                  >
                                   <span class="form-check-label category-label">{{ $child->name }}</span>
                                 </label>
 
@@ -339,7 +350,13 @@
                                     @foreach($child->children_nested as $subChild)
                                       <li>
                                         <label for="" class="form-check category-wrapper">
-                                          <input type="checkbox" class="form-check-input category-check" name="categories[]" value="{{ $subChild->id }}">
+                                          <input
+                                            type="checkbox"
+                                            class="form-check-input category-check"
+                                            name="categories[]"
+                                            value="{{ $subChild->id }}"
+                                            @checked(in_array($subChild->id, $productCategoryIds ))
+                                          >
                                           <span class="form-check-label category-label">{{ $subChild->name }}</span>
                                         </label>
                                       </li>
@@ -368,7 +385,9 @@
                   <select name="brand" class="form-select select2" id="">
                     <option value="">Select a brand</option>
                     @foreach($brands as $brand)
-                      <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                      <option value="{{ $brand->id }}" @selected($product->brand_id == $brand->id) >
+                        {{ $brand->name }}
+                      </option>
                     @endforeach
                   </select>
                   <x-input-error :messages="$errors->get('brand')" />
@@ -385,14 +404,13 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-check">
-                    <input class="form-check-input" type="checkbox" name="is_hot">
+                    <input class="form-check-input" type="checkbox" name="is_hot" @checked($product->is_hot)>
                     <span class="form-check-label">Hot</span>
                   </label>
                   <label class="form-check">
-                    <input class="form-check-input" type="checkbox" name="is_new">
+                    <input class="form-check-input" type="checkbox" name="is_new" @checked($product->is_new)>
                     <span class="form-check-label">New</span>
                   </label>
-                  <x-input-error :messages="$errors->get('brand')" />
                 </div>
               </div>
             </div>
@@ -407,7 +425,9 @@
                 <div class="mb-3">
                   <select name="tags[]" class="form-select select2" id="" multiple="multiple">
                     @foreach($tags as $tag)
-                      <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                      <option value="{{ $tag->id }}" @selected(in_array($tag->id, $productTagsIds))>
+                        {{ $tag->name }}
+                      </option>
                     @endforeach
                   </select>
                   <x-input-error :messages="$errors->get('tags')" />
@@ -420,7 +440,7 @@
             <div class="card-body">
               <div class="col-md-12">
                 <div class="mb-3 row">
-                  <button type="submit" class="btn btn-primary mt-3">Create</button>
+                  <button type="submit" class="btn btn-primary mt-3">Update</button>
                 </div>
               </div>
             </div>
@@ -522,7 +542,7 @@
         // Ajax Request
         $.ajax({
           method: "POST",
-          url: '{{ route('admin.products.store') }}',
+          url: "{{ route('admin.products.update', ':id' ) }}" . replace(':id', '{{ $product->id }}'),
           data: data,
           contentType: false,
           processData: false,
