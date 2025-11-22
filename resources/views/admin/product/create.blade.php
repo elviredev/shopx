@@ -480,6 +480,7 @@
     if (query === '') {
       $('#category-tree li').removeClass('d-none');
     }
+
   })
 
   // Manage stock checkbox - Quantity input is hidden when manage stock is unchecked

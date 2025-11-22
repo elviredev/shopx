@@ -1,7 +1,10 @@
 @extends('admin.layouts.app')
 
 @push('styles')
+  {{-- CDN Dropzone Upload Fichier --}}
   <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+  {{-- CDN simonwep Color Picker --}}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
 
   <style>
     .dropzone {
@@ -243,6 +246,22 @@
               </div>
             </div>
           </div>
+
+          <div class="card mt-3" id="product-images">
+            <div class="card-header">
+              <h3 class="card-title">Product Attributes</h3>
+            </div>
+            <div class="card-body">
+              <div class="col-md-12">
+
+                <div class="accordion" id="accordion-default">
+
+                </div>
+
+                <button class="btn btn-primary mt-3" id="add-attribute-btn">Add Attribute</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!--- Options -->
@@ -454,10 +473,300 @@
 @endsection
 
 @push('scripts')
-  {{-- CDN Dropzone --}}
+  {{-- CDN Dropzone Upload Fichier  --}}
   <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
-  {{-- CDN SortableJS --}}
+  {{-- CDN SortableJS Drag & Drop --}}
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+  {{-- CDN simonwep Color Picker --}}
+  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr"></script>
+
+  {{-- Partie Attributes --}}
+  <script>
+    $(function() {
+      /** Color Picker */
+      const pickerInstances = {}
+      let uniqueCounter = 0
+
+      // générer un unique ID pour nos couleurs
+      function generateUniqueColorId(prefix = 'picker-') {
+        return prefix + uniqueCounter++ + '-' + Date.now()
+      }
+
+      // Pick init
+      function createPicker(pickerId, defaultColor, inputSelector) {
+        // si une instance de Picker existe, on la supprime
+        if (pickerInstances[pickerId]) {
+          pickerInstances[pickerId].destroyAndRemove()
+        }
+
+        // Pickr crée un color picker lié à une div précise
+        const picker = Pickr.create({
+          el: `#${pickerId}`,
+          theme: 'classic',
+          default: defaultColor,
+          components: {
+            preview: true,
+            opacity: true,
+            hue: true,
+            interaction: {
+              hex: true,
+              rgba: true,
+              input: true,
+              clear: true,
+              save: true
+            }
+          }
+        })
+
+        // a chaque changement
+        picker.on('change', (color) => {
+          // récupére la couleur sélectionnée
+          const selectedColor = color.toHEXA().toString()
+          // change la couleur du preview (la div)
+          $(`#${pickerId}`).css('background-color', selectedColor)
+          // met à jour l'input associé
+          $(inputSelector).val(selectedColor)
+        })
+
+        // stocke l'instance de Picker dans un objet global
+        pickerInstances[pickerId] = picker
+      }
+
+      // supprime l'instance de Picker
+      function destroyPicker(pickerId) {
+        if (pickerInstances[pickerId]) {
+          pickerInstances[pickerId].destroyAndRemove()
+          delete pickerInstances[pickerId]
+        }
+      }
+
+      // initier les pickers sur les divs color-preview
+      function initColorPickersInContainer($container) {
+        $container.find('.color-preview').each(function () {
+          const $this = $(this)
+          const pickerId = $this.attr('id')
+          const currentColor = $this.css('background-color') || '#000000'
+          createPicker(pickerId, currentColor, `input[data-picker-id="${pickerId}"]`)
+        })
+      }
+
+      /** Add Accordion Item for Attributes */
+      let count = 0
+
+      // Ajouter un nouvel attribut (accordion item)
+      $('#add-attribute-btn').on('click', function () {
+        count++
+        const collapseId = 'collapse' + count
+        const headerId = 'header' + count
+
+        const accordionItem = `
+          <div class="accordion-item" data-index="${count}">
+            <div class="accordion-header" id="${headerId}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false">
+                New Attribute #${count}
+                <div class="accordion-button-toggle">
+                  <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-down -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </div>
+              </button>
+              <span class="delete-btn btn btn-danger btn-sm p-1 me-2"><i class="ti ti-trash"></i></span>
+            </div>
+            <div id="${collapseId}" class="accordion-collapse collapse" data-bs-parent="#accordion-default" style="">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="" class="form-label">Name</label>
+                    <input type="text" class="form-control" name="" value="">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="" class="form-label">Type</label>
+                    <select name="" id="" class="form-select main-type">
+                      <option value="text">Text</option>
+                      <option value="color">Color</option>
+                    </select>
+                  </div>
+                </div>
+
+                <table class="table table-bordered section-table mt-3" style="display: none;">
+                  <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th class="value-header">Value</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+                </table>
+
+                <div class="mt-2">
+                  <button class="btn btn-sm btn-secondary p-1 add-row-btn">Add Row</button>
+                  <button class="btn btn-sm btn-success p-1">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+        // ajouter l'item au DOM
+        $('#accordion-default').append(accordionItem)
+      })
+
+      // ajouter une ligne
+      $(document).on('click', '.add-row-btn', function () {
+        const accordionBody = $(this).closest('.accordion-body')
+        const type = accordionBody.find('.main-type').val()
+        const table = accordionBody.find('.section-table')
+        const tbody = table.find('tbody')
+        table.show()
+
+        const pickerId = generateUniqueColorId()
+        let rowHtml = ''
+
+        if (type === 'color') {
+          rowHtml = `
+            <tr>
+              <td>
+                <input type="text" class="form-control label-input" name="" value="" placeholder="Label">
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div id="${pickerId}" class="color-preview"></div>
+                  <input type="hidden" class="color-value" data-picker-id="${pickerId}" name="">
+                  <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
+                </div>
+              </td>
+            </tr>
+          `
+        } else {
+          rowHtml = `
+            <tr>
+              <td colspan="2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <input type="text" class="form-control label-input" name="" value="" placeholder="Label">
+                  <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
+                </div>
+              </td>
+            </tr>
+          `
+        }
+        // ajouté la ligne au DOM
+        tbody.append(rowHtml)
+
+        // init color picker
+        if (type === 'color') {
+          createPicker(pickerId, '#000000', `input[data-picker-id="${pickerId}"]`)
+        }
+      })
+
+      // remove attribute values
+      $(document).on('click', '.remove-row-btn', function () {
+        const $row = $(this).closest('tr')
+        const $colorPreview = $row.find('.color-preview')
+
+        if ($colorPreview.length) {
+          destroyPicker($colorPreview.attr('id'))
+        }
+
+        const $table = $(this).closest('.section-table')
+
+        // supprimer la ligne du DOM
+        $row.remove()
+
+        const $tbody = $table.find('tbody')
+        if ($tbody.find('tr').length === 0) {
+          $table.hide()
+        }
+      })
+
+      // change type => remove rows and manage pickers
+      $(document).on('change', '.main-type', function () {
+        const $accordionBody = $(this).closest('.accordion-body')
+        const type = $(this).val()
+        const $table = $accordionBody.find('.section-table')
+        const $tbody = $table.find('tbody')
+
+        // collect row values and destroy any existing pickers
+        const labels = []
+
+        $tbody.find('tr').each(function () {
+          // supprime toute instance de color picker existante
+          const colorPreview = $(this).find('.color-preview')
+          if (colorPreview.length) {
+            destroyPicker(colorPreview.attr('id'))
+          }
+          // récupérer les labels (lignes) qu'on insére dans le tableau
+          const labelValue = $(this).find('.label-input').val()
+          labels.push(labelValue || '')
+        })
+
+        $tbody.empty()
+
+        // générer de nouvelles lignes pour le nouveau type
+        labels.forEach(label => {
+          const pickerId = generateUniqueColorId()
+          let rowHtml = ''
+
+          if (type === 'color') {
+            rowHtml = `
+            <tr>
+              <td>
+                <input type="text" class="form-control label-input" name="" value="${label}" placeholder="Label">
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div id="${pickerId}" class="color-preview"></div>
+                  <input type="hidden" class="color-value" data-picker-id="${pickerId}" name="">
+                  <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
+                </div>
+              </td>
+            </tr>
+          `
+          } else {
+            rowHtml = `
+            <tr>
+              <td colspan="2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <input type="text" class="form-control label-input" name="" value="${label}" placeholder="Label">
+                  <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
+                </div>
+              </td>
+            </tr>
+          `
+          }
+
+          // ajouté la ligne au DOM
+          $tbody.append(rowHtml)
+
+          // init color picker
+          if (type === 'color') {
+            createPicker(pickerId, '#000000', `input[data-picker-id="${pickerId}"]`)
+          }
+
+        })
+
+        if(labels.length > 0) {
+          $table.show()
+        } else {
+          $table.hide()
+        }
+
+      })
+
+      // remove attribute
+      $(document).on('click', '.delete-btn', function () {
+        const $accordionItem = $(this).closest('.accordion-item')
+        // supprimer les instances de color picker existantes
+        $accordionItem.find('.color-preview').each(function () {
+          destroyPicker($(this).attr('id'))
+        })
+        // supprimer l'item du DOM
+        $accordionItem.remove()
+      })
+
+    })
+  </script>
 
   <script>
     // handle checkbox change event

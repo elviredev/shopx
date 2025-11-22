@@ -10,3 +10,4 @@
 - **Select2** : Fonction de recherche dans une liste déroulante
 - **Dropzone JS** : Upload de fichiers
 - **SortableJS** : Tri des images - Drag & Drop
+- **Simonwep/pickr** : Choix de couleur - Color Picker
