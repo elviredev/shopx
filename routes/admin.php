@@ -112,6 +112,9 @@ Route::middleware('auth:admin')
   Route::delete('/products/images/{image}', [ProductController::class, 'destroyImage'])->name('products.images.destroy');
   Route::post('/products/images/reorder', [ProductController::class, 'reorderImages'])->name('products.images.reorder');
 
+  /** Products Attributes Routes */
+  Route::post('/products/attributes/{product}/store', [ProductController::class, 'storeAttributes'])
+    ->name('products.attributes.store');
 
   /** Settings Routes */
   route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

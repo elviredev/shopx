@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductStoreRequest;
 use App\Http\Requests\Admin\ProductUpdateRequest;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -14,10 +16,13 @@ use App\Models\Tag;
 use App\Traits\FileUploadTrait;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
   use FileUploadTrait;
+
+  /** =================== Product CRUD ==================== */
 
   public function index(): View
   {
@@ -81,9 +86,18 @@ class ProductController extends Controller
     $tags = Tag::where('is_active', 1)->get();
     $categories = Category::getNested();
 
-    return view('admin.product.edit', compact('stores', 'brands', 'tags', 'categories', 'product', 'productCategoryIds', 'productTagsIds'));
+    $attributesWithValues = $product?->attributesWithValues ?? [];
+    // dd($attributesWithValues);
+
+    return view('admin.product.edit', compact('stores', 'brands', 'tags', 'categories', 'product', 'productCategoryIds', 'productTagsIds', 'attributesWithValues'));
   }
 
+  /**
+   * @desc Update product
+   * @param ProductUpdateRequest $request
+   * @param int $id
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function update(ProductUpdateRequest $request, int $id)
   {
     $product = Product::findOrFail($id);
@@ -119,6 +133,7 @@ class ProductController extends Controller
     ]);
   }
 
+  /** =================== Product Image ==================== */
   public function uploadImages(Request $request, Product $product)
   {
     $request->validate([
@@ -160,4 +175,86 @@ class ProductController extends Controller
       ProductImage::where('id', $image['id'])->update(['order' => $image['order']]);
     }
   }
+
+  /** =================== Product Attributes ==================== */
+
+  /**
+   * @desc Store product attributes
+   * Gère la création d’un nouvel attribut (ex : Taille, Couleur, Matière...) et délègue
+   * ensuite la création des valeurs associées.
+   */
+  public function storeAttributes(Request $request, Product $product)
+  {
+    $request->validate([
+      'attribute_name' => ['required', 'string', 'max:255'],
+      'attribute_type' => ['required', 'string', 'in:text,color']
+    ]);
+
+    $attribute = new Attribute();
+    $attribute->name = $request->attribute_name;
+    $attribute->type = $request->attribute_type;
+    $attribute->save();
+
+    $this->addAttributesValue($request, $attribute, $product);
+
+    return response()->json([
+      'status' => 'success',
+      'attribute' => $attribute,
+      'message' => 'Attribute created successfully.'
+    ]);
+  }
+
+  /**
+   * @desc Gère la création des valeurs associées à l’attribut et leur liaison
+   * avec le produit via une table pivot
+   * @param Request $request
+   * @param Attribute $attribute
+   * @param Product $product
+   * @return void
+   */
+  public function addAttributesValue(Request $request, Attribute $attribute, Product $product)
+  {
+    // récupérer les labels du champs de formulaire
+    $labels = $request->label ?? [];
+
+    foreach ($labels as $index => $label) {
+      // si pas de label, continuer
+      if (empty($label)) continue;
+
+      // créer une nouvelle valeur d'attribut et la stocker dans la table "attribute_values"
+      $attributeValue = new AttributeValue();
+      $attributeValue->attribute_id = $attribute->id;
+      $attributeValue->value = $label;
+      $attributeValue->color = $request->color_value[$index] ?? null;
+      $attributeValue->save();
+
+      // assigner à un produit
+      DB::table('product_attribute_values')->insert([
+        'product_id' => $product->id,
+        'attribute_id' => $attribute->id,
+        'attribute_value_id' => $attributeValue->id
+      ]);
+
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

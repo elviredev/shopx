@@ -255,7 +255,12 @@
               <div class="col-md-12">
 
                 <div class="accordion" id="accordion-default">
-
+                  @foreach($attributesWithValues as $attribute)
+                    @include('admin.product.partials.attribute', [
+                      'attribute' => $attribute,
+                      'product' => $product
+                    ])
+                  @endforeach
                 </div>
 
                 <button class="btn btn-primary mt-3" id="add-attribute-btn">Add Attribute</button>
@@ -575,36 +580,39 @@
             </div>
             <div id="${collapseId}" class="accordion-collapse collapse" data-bs-parent="#accordion-default" style="">
               <div class="accordion-body">
-                <div class="row">
-                  <div class="col-md-6">
-                    <label for="" class="form-label">Name</label>
-                    <input type="text" class="form-control" name="" value="">
+                <form action="#" method="POST" class="attribute-form" >
+                  @csrf
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label for="" class="form-label">Name</label>
+                      <input type="text" class="form-control" name="attribute_name">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="" class="form-label">Type</label>
+                      <select name="attribute_type" id="" class="form-select main-type">
+                        <option value="text">Text</option>
+                        <option value="color">Color</option>
+                      </select>
+                    </div>
                   </div>
-                  <div class="col-md-6">
-                    <label for="" class="form-label">Type</label>
-                    <select name="" id="" class="form-select main-type">
-                      <option value="text">Text</option>
-                      <option value="color">Color</option>
-                    </select>
-                  </div>
+
+                  <table class="table table-bordered section-table mt-3" style="display: none;">
+                    <thead>
+                    <tr>
+                      <th>Label</th>
+                      <th class="value-header">Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                  </table>
+
+                  <div class="mt-2">
+                  <button type="button" class="btn btn-sm btn-secondary p-1 add-row-btn">Add Row</button>
+                  <button type="button" class="btn btn-sm btn-success p-1 save-btn">Save</button>
                 </div>
-
-                <table class="table table-bordered section-table mt-3" style="display: none;">
-                  <thead>
-                  <tr>
-                    <th>Label</th>
-                    <th class="value-header">Value</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-
-                  </tbody>
-                </table>
-
-                <div class="mt-2">
-                  <button class="btn btn-sm btn-secondary p-1 add-row-btn">Add Row</button>
-                  <button class="btn btn-sm btn-success p-1">Save</button>
-                </div>
+                </form>
               </div>
             </div>
           </div>
@@ -628,12 +636,12 @@
           rowHtml = `
             <tr>
               <td>
-                <input type="text" class="form-control label-input" name="" value="" placeholder="Label">
+                <input type="text" class="form-control label-input" name="label[]" value="" placeholder="Label">
               </td>
               <td>
                 <div class="d-flex align-items-center gap-2">
                   <div id="${pickerId}" class="color-preview"></div>
-                  <input type="hidden" class="color-value" data-picker-id="${pickerId}" name="">
+                  <input type="hidden" class="color-value" data-picker-id="${pickerId}" name="color_value[]">
                   <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
                 </div>
               </td>
@@ -644,7 +652,7 @@
             <tr>
               <td colspan="2">
                 <div class="d-flex justify-content-between align-items-center">
-                  <input type="text" class="form-control label-input" name="" value="" placeholder="Label">
+                  <input type="text" class="form-control label-input" name="label[]" value="" placeholder="Label">
                   <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
                 </div>
               </td>
@@ -712,12 +720,14 @@
             rowHtml = `
             <tr>
               <td>
-                <input type="text" class="form-control label-input" name="" value="${label}" placeholder="Label">
+                <input type="text" class="form-control label-input" name="label[]" value="${label}" placeholder="Label">
               </td>
               <td>
                 <div class="d-flex align-items-center gap-2">
                   <div id="${pickerId}" class="color-preview"></div>
-                  <input type="hidden" class="color-value" data-picker-id="${pickerId}" name="">
+                  <input type="hidden" class="color-value" data-picker-id="${pickerId}" name="color_value[]">
+                  <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
+                  </input>
                   <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
                 </div>
               </td>
@@ -728,7 +738,7 @@
             <tr>
               <td colspan="2">
                 <div class="d-flex justify-content-between align-items-center">
-                  <input type="text" class="form-control label-input" name="" value="${label}" placeholder="Label">
+                  <input type="text" class="form-control label-input" name="label[]" value="${label}" placeholder="Label">
                   <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
                 </div>
               </td>
@@ -763,6 +773,30 @@
         })
         // supprimer l'item du DOM
         $accordionItem.remove()
+      })
+
+      // save attribute values
+      $(document).on('click', '.save-btn', function (e) {
+        e.preventDefault()
+
+        const form = $(this).closest('.attribute-form')
+        const data = form.serialize()
+
+        $.ajax({
+          url: "{{ route('admin.products.attributes.store', ':id') }}". replace(':id', '{{ $product->id }}'),
+          method: 'POST',
+          data: data,
+          success: function (response) {
+            console.log(response)
+          },
+          error: function (xhr, status, error) {
+          }
+        })
+      })
+
+      // initialyze color pickers in accordions on load
+      $(document).ready(function () {
+        initColorPickersInContainer($('#accordion-default'))
       })
 
     })
