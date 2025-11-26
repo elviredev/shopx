@@ -580,7 +580,7 @@
             </div>
             <div id="${collapseId}" class="accordion-collapse collapse" data-bs-parent="#accordion-default" style="">
               <div class="accordion-body">
-                <form action="#" method="POST" class="attribute-form" >
+                <form action="#" method="POST" class="">
                   @csrf
                   <div class="row">
                     <div class="col-md-6">
@@ -771,15 +771,48 @@
         $accordionItem.find('.color-preview').each(function () {
           destroyPicker($(this).attr('id'))
         })
-        // supprimer l'item du DOM
-        $accordionItem.remove()
+
+        // récupérer les identifiants (depuis attribute.blade)
+        const productId = $(this).data('product-id')
+        const attributeId = $(this).data('attribute-id')
+
+        // sweetalert2 pour confirmer la suppression
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // requête ajax pour supprimer l'attribut
+            $.ajax({
+              url: "{{ route('admin.products.attributes.destroy', [':id', ':attribute_id']) }}"
+                .replace(':id', productId).replace(':attribute_id', attributeId),
+              method: 'DELETE',
+              data: {
+                _token: "{{ csrf_token() }}"
+              },
+              success: function (response) {
+                $('#accordion-default').html(response.html)
+                notyf.success(response.message)
+              },
+              error: function (xhr, status, error) {
+                notyf.error(error)
+              }
+            })
+          }
+        });
+
       })
 
       // save attribute values
       $(document).on('click', '.save-btn', function (e) {
         e.preventDefault()
 
-        const form = $(this).closest('.attribute-form')
+        const form = $(this).closest('form')
         const data = form.serialize()
 
         $.ajax({
@@ -787,7 +820,9 @@
           method: 'POST',
           data: data,
           success: function (response) {
-            console.log(response)
+            $('#accordion-default').html(response.html)
+            initColorPickersInContainer($('#accordion-default'))
+            notyf.success(response.message)
           },
           error: function (xhr, status, error) {
           }

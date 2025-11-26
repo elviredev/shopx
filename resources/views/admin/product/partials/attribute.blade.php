@@ -9,66 +9,76 @@
         </svg>
       </div>
     </button>
-    <span class="delete-btn btn btn-danger btn-sm p-1 me-2"><i class="ti ti-trash"></i></span>
+    <span
+      class="delete-btn btn btn-danger btn-sm p-1 me-2"
+      data-product-id="{{ $product->id }}"
+      data-attribute-id="{{ $attribute->id }}"
+    >
+      <i class="ti ti-trash"></i>
+    </span>
   </div>
   <div id="collapse-{{ $attribute->id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-default" style="">
     <div class="accordion-body">
-      <div class="row">
-        <div class="col-md-6">
-          <label for="" class="form-label">Name</label>
-          <input type="text" class="form-control" name="attribute_name" value="{{ $attribute->name }}">
+      <form action="" class="attribute-form">
+        @csrf
+        <div class="row">
+          <div class="col-md-6">
+            <label for="" class="form-label">Name</label>
+            <input type="text" class="form-control" name="attribute_name" value="{{ $attribute->name }}">
+            <input type="hidden" name="attribute_id" value="{{ $attribute->id }}">
+          </div>
+          <div class="col-md-6">
+            <label for="" class="form-label">Type</label>
+            <select name="attribute_type" id="" class="form-select main-type">
+              <option value="text" @selected($attribute->type == 'text')>Text</option>
+              <option value="color" @selected($attribute->type == 'color')>Color</option>
+            </select>
+          </div>
         </div>
-        <div class="col-md-6">
-          <label for="" class="form-label">Type</label>
-          <select name="attribute_type" id="" class="form-select">
-            <option value="text" @selected($attribute->type == 'text')>Text</option>
-            <option value="color" @selected($attribute->type == 'color')>Color</option>
-          </select>
-        </div>
-      </div>
 
-      <table class="table table-bordered section-table mt-3" style="{{ count($attribute->values) ? '' : 'display: none;' }}">
-        <thead>
-          <tr>
-            <th>Label</th>
-            <th class="value-header">Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if($attribute->type == 'color')
-            @foreach($attribute->values as $value)
-              <tr>
-                <td>
-                  <input type="text" class="form-control label-input" name="label[]" value="{{ $value->value }}" placeholder="Label">
-                </td>
-                <td>
-                  <div class="d-flex align-items-center gap-2">
-                    <div id="pickr-{{ $value->id }}" class="color-preview" style="background-color: {{ $value->color }}"></div>
-                    <input type="hidden" class="color-value" data-picker-id="pickr-{{ $value->id }}" name="color_value[]" value="{{ $value->color }}">
-                    <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
-                  </div>
-                </td>
-              </tr>
-            @endforeach
-          @else
-            @foreach($attribute->values as $value)
-              <tr>
-                <td colspan="2">
-                  <div class="d-flex justify-content-between align-items-center">
+        <table class="table table-bordered section-table mt-3" style="{{ count($attribute->values) ? '' : 'display: none;' }}">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th class="value-header">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if($attribute->type == 'color')
+              @foreach($attribute->values as $value)
+                <tr>
+                  <td>
                     <input type="text" class="form-control label-input" name="label[]" value="{{ $value->value }}" placeholder="Label">
-                    <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
-                  </div>
-                </td>
-              </tr>
-            @endforeach
-         @endif
-        </tbody>
-      </table>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div id="pickr-{{ $value->id }}" class="color-preview" style="background-color: {{ $value->color }}"></div>
+                      <input type="hidden" class="color-value" data-picker-id="pickr-{{ $value->id }}" name="color_value[]" value="{{ $value->color }}">
+                      <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
+                    </div>
+                  </td>
+                </tr>
+              @endforeach
+            @else
+              @foreach($attribute->values as $value)
+                <tr>
+                  <td colspan="2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <input type="text" class="form-control label-input" name="label[]" value="{{ $value->value }}" placeholder="Label">
+                      <span class="remove-row-btn btn btn-danger btn-sm p-1 ms-2"><i class="ti ti-trash"></i></span>
+                    </div>
+                  </td>
+                </tr>
+              @endforeach
+           @endif
+          </tbody>
+        </table>
 
-      <div class="mt-2">
-        <button class="btn btn-sm btn-secondary p-1">Add Row</button>
-        <button class="btn btn-sm btn-success p-1">Save</button>
-      </div>
+        <div class="mt-2">
+          <button type="button" class="btn btn-sm btn-secondary p-1 add-row-btn">Add Row</button>
+          <button type="button" class="btn btn-sm btn-success p-1 save-btn">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

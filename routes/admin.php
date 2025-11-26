@@ -115,6 +115,8 @@ Route::middleware('auth:admin')
   /** Products Attributes Routes */
   Route::post('/products/attributes/{product}/store', [ProductController::class, 'storeAttributes'])
     ->name('products.attributes.store');
+  Route::delete('/products/attributes/{product}/{attribute}', [ProductController::class, 'destroyAttribute'])
+    ->name('products.attributes.destroy');
 
   /** Settings Routes */
   route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

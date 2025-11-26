@@ -190,18 +190,77 @@ class ProductController extends Controller
       'attribute_type' => ['required', 'string', 'in:text,color']
     ]);
 
+    DB::beginTransaction();
+
+    try {
+      if ($request->filled('attribute_id')) {
+        $this->updateExistingAttribute($request, $product);
+      } else {
+        $this->createNewAttribute($request, $product);
+      }
+
+      DB::commit();
+    } catch (\Throwable $th) {
+      DB::rollBack();
+      return response()->json(['error' => $th->getMessage()], 500);
+    }
+
+    return $this->buildSuccessResponse($product);
+  }
+
+  /**
+   * @desc Create new attribute
+   * @param Request $request
+   * @param Product $product
+   * @return void
+   */
+  public function createNewAttribute(Request $request, Product $product)
+  {
     $attribute = new Attribute();
     $attribute->name = $request->attribute_name;
     $attribute->type = $request->attribute_type;
     $attribute->save();
 
     $this->addAttributesValue($request, $attribute, $product);
+  }
 
-    return response()->json([
-      'status' => 'success',
-      'attribute' => $attribute,
-      'message' => 'Attribute created successfully.'
-    ]);
+  /**
+   * @desc Update existing attribute
+   * @param Request $request
+   * @param Product $product
+   * @return void
+   */
+  public function updateExistingAttribute(Request $request, Product $product)
+  {
+    // Find attribute
+    $attribute = Attribute::findOrFail($request->attribute_id);
+    $attribute->name = $request->attribute_name;
+    $attribute->type = $request->attribute_type;
+    $attribute->save();
+
+    //remove existing relations and values for this attribute
+    $this->clearAttributeData($attribute, $product);
+
+    // add new values for this attribute
+    $this->addAttributesValue($request, $attribute, $product);
+  }
+
+  /**
+   * @desc Delete relations and values for an attribute
+   * @param Attribute $attribute
+   * @param Product $product
+   * @return void
+   */
+  public function clearAttributeData(Attribute $attribute, Product $product)
+  {
+    // Delete relationship
+    DB::table('product_attribute_values')
+      ->where('product_id', $product->id)
+      ->where('attribute_id', $attribute->id)
+      ->delete();
+
+    // Delete attribute values
+    AttributeValue::where('attribute_id', $attribute->id)->delete();
   }
 
   /**
@@ -235,6 +294,62 @@ class ProductController extends Controller
         'attribute_value_id' => $attributeValue->id
       ]);
 
+    }
+  }
+
+  /**
+   * @desc Build and return a success response with updated attributes for the product
+   * @param Product $product
+   * @return \Illuminate\Http\JsonResponse
+   * @throws \Throwable
+   */
+  public function buildSuccessResponse(Product $product)
+  {
+    // actualiser toutes les relations existante du produit
+    $product->refresh();
+
+    // récupérer les valeurs des attributs pour le produit passé en paramètre
+    $attributes = $product->attributesWithValues;
+
+    $html = '';
+
+    foreach ($attributes as $attribute) {
+      // passer les attributs à la vue
+      $html .= view('admin.product.partials.attribute', compact('attribute', 'product'))->render();
+    }
+
+    return response()->json([
+      'message' => 'Attributes generated successfully.',
+      'html' => $html
+    ]);
+  }
+
+  public function destroyAttribute(int $productId, int $attributeId)
+  {
+    try {
+      $product = Product::findOrFail($productId);
+      $attribute = Attribute::findOrFail($attributeId);
+
+      $this->clearAttributeData($attribute, $product);
+
+      $product->refresh();
+
+      // récupérer les valeurs des attributs pour le produit passé en paramètre
+      $attributes = $product->attributesWithValues;
+
+      $html = '';
+
+      foreach ($attributes as $attribute) {
+        // passer les attributs à la vue
+        $html .= view('admin.product.partials.attribute', compact('attribute', 'product'))->render();
+      }
+
+      return response()->json([
+        'message' => 'Attributes deleted successfully.',
+        'html' => $html
+      ]);
+    } catch (\Throwable $th) {
+      return response()->json(['error' => $th->getMessage()], 500);
     }
   }
 }
