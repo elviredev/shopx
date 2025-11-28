@@ -267,6 +267,19 @@
               </div>
             </div>
           </div>
+
+          <div class="card mt-3" id="product-images">
+            <div class="card-header">
+              <h3 class="card-title">Product Variants</h3>
+            </div>
+            <div class="card-body">
+              <div class="col-md-12">
+                <div class="accordion" id="accordion-variant">
+                  @include('admin.product.partials.variant')
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!--- Options -->

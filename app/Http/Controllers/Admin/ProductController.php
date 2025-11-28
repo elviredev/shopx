@@ -11,11 +11,13 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductVariant;
 use App\Models\Store;
 use App\Models\Tag;
 use App\Traits\FileUploadTrait;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -72,7 +74,7 @@ class ProductController extends Controller
       'id' => $product->id,
       'redirect_url' => route('admin.products.edit', $product->id) .'#product-images',
       'status' => 'success',
-      'message' => 'Product created successfully.'
+      'message' => 'Product created successfully.',
     ]);
   }
 
@@ -129,7 +131,7 @@ class ProductController extends Controller
     return response()->json([
       'id' => $product->id,
       'status' => 'success',
-      'message' => 'Product updated successfully.'
+      'message' => 'Product updated successfully.',
     ]);
   }
 
@@ -137,7 +139,7 @@ class ProductController extends Controller
   public function uploadImages(Request $request, Product $product)
   {
     $request->validate([
-      'image' => [ 'required', 'image', 'max:2048']
+      'image' => [ 'required', 'image', 'max:2048'],
     ]);
 
     $imagePath = $this->uploadFile($request->file('image'));
@@ -152,7 +154,7 @@ class ProductController extends Controller
       'status' => 'success',
       'id' => $productImage->id,
       'path' => asset($imagePath),
-      'message' => 'Image uploaded successfully.'
+      'message' => 'Image uploaded successfully.',
     ]);
   }
 
@@ -164,7 +166,7 @@ class ProductController extends Controller
 
     return response()->json([
       'status' => 'success',
-      'message' => 'Image deleted successfully.'
+      'message' => 'Image deleted successfully.',
     ]);
   }
 
@@ -187,7 +189,7 @@ class ProductController extends Controller
   {
     $request->validate([
       'attribute_name' => ['required', 'string', 'max:255'],
-      'attribute_type' => ['required', 'string', 'in:text,color']
+      'attribute_type' => ['required', 'string', 'in:text,color'],
     ]);
 
     DB::beginTransaction();
@@ -200,6 +202,10 @@ class ProductController extends Controller
       }
 
       DB::commit();
+
+      // regenerate product variants
+      $this->regenerateProductVariants($product);
+
     } catch (\Throwable $th) {
       DB::rollBack();
       return response()->json(['error' => $th->getMessage()], 500);
@@ -291,7 +297,7 @@ class ProductController extends Controller
       DB::table('product_attribute_values')->insert([
         'product_id' => $product->id,
         'attribute_id' => $attribute->id,
-        'attribute_value_id' => $attributeValue->id
+        'attribute_value_id' => $attributeValue->id,
       ]);
 
     }
@@ -320,7 +326,7 @@ class ProductController extends Controller
 
     return response()->json([
       'message' => 'Attributes generated successfully.',
-      'html' => $html
+      'html' => $html,
     ]);
   }
 
@@ -346,12 +352,162 @@ class ProductController extends Controller
 
       return response()->json([
         'message' => 'Attributes deleted successfully.',
-        'html' => $html
+        'html' => $html,
       ]);
     } catch (\Throwable $th) {
       return response()->json(['error' => $th->getMessage()], 500);
     }
   }
+
+  /**
+   * @desc Méthode principale qui orchestre toute la génération des variantes
+   * @param Product $product
+   * @return void
+   * @throws \Exception
+   */
+  public function regenerateProductVariants(Product $product)
+  {
+    // Supprimer toutes les anciennes variantes du produit.
+    $this->clearExistingVariants($product);
+
+    // Récupérer les valeurs d’attributs groupées par attribut
+    $attributeGroups = $this->getAttributeGroups($product);
+
+    if ($attributeGroups->isEmpty()) {
+      throw new \Exception('No attribute values found for varaint génération');
+    }
+
+    // Créer des combinaisons possibles pour les attributs
+    $combinations = $this->cartesianProduct($attributeGroups);
+
+    // Créer réellement les variantes dans la DB
+    $this->createVariantsFromCombinations($product, $combinations);
+
+  }
+
+  /**
+   * @desc Récupérer toutes les valeurs d’attributs liées à un produit, groupées par attribut,
+   * et les retourner sous forme d’une collection exploitable pour le produit cartésien.
+   * - Récupère toutes les associations attribut/valeur du produi
+   * - Regroupe par attribut
+   * - Charge réellement les objets AttributeValue
+   * - Retourne une collection prête pour la génération des combinaisons
+   * @param Product $product
+   * @return Collection
+   */
+  public function getAttributeGroups(Product $product)
+  {
+    $groupedAttributes = DB::table('product_attribute_values')
+      ->where('product_id', $product->id)
+      ->get()->groupBy('attribute_id');
+
+    // créer une collection pour accèder facilement aux valeurs sous forme d'objets
+    $attributeGroups = collect();
+
+    foreach ($groupedAttributes as $attributeId => $items) {
+      // récupérer valeurs pour chaque attribut
+      $attributeValues = AttributeValue::whereIn('id', $items->pluck('attribute_value_id'))->get();
+      $attributeGroups->push($attributeValues);
+    }
+
+    return $attributeGroups;
+  }
+
+  /**
+   * @desc Générer toutes les combinaisons possibles des attributs.
+   * @param Collection $attributeGroups
+   * @return array|array[]
+   */
+  public function cartesianProduct(Collection $attributeGroups)
+  {
+    $result = [[]];
+
+    foreach ($attributeGroups as $attributeValues) {
+      $temp = [];
+
+      foreach ($result as $resultItem) {
+        foreach ($attributeValues as $attributeValue) {
+          $temp[] = array_merge($resultItem, [$attributeValue]);
+        }
+      }
+
+      $result = $temp;
+    }
+
+    return $result;
+  }
+
+
+  /**
+   * @desc Créer les variantes et attacher leurs attributs
+   * @param Product $product
+   * @param array $combinations
+   * @return void
+   */
+  public function createVariantsFromCombinations(Product $product, array $combinations)
+  {
+    foreach ($combinations as $combination) {
+      $variant = $this->createSingleVariant($product, $combination);
+      $this->attachAttributesToVariant($variant, $combination);
+    }
+  }
+
+  /**
+   * @desc Créer une variante en base
+   * @param Product $product
+   * @param array $combination
+   * @return ProductVariant*
+   */
+  public function createSingleVariant(Product $product, array $combination)
+  {
+    $variantName = collect($combination)->pluck('value')->implode('/');
+
+    return ProductVariant::create([
+      'product_id' => $product->id,
+      'name' => $variantName,
+      'price' => 0,
+      'sku' => '',
+      'qty' => 0
+    ]);
+  }
+
+  /**
+   * @desc Insérer dans la table pivot les liaisons entre variante et valeurs.
+   * @param ProductVariant $variant
+   * @param array $combination
+   * @return void
+   */
+  public function attachAttributesToVariant(ProductVariant $variant, array $combination)
+  {
+    foreach ($combination as $attributeValue) {
+      DB::table('product_variant_attribute_value')->insert([
+        'product_variant_id' => $variant->id,
+        'attribute_id' => $attributeValue->attribute_id,
+        'attribute_value_id' => $attributeValue->id
+      ]);
+    }
+  }
+
+  /**
+   * @desc Supprime toutes les variantes existantes pour un produit
+   * @param Product $product
+   * @return void
+   */
+  public function clearExistingVariants(Product $product)
+  {
+    foreach ($product->variants as $variant) {
+      // suppression de la relation entre le produit et les variantes
+      DB::table('product_variant_attribute_value')
+        ->where('product_variant_id', $variant->id)
+        ->delete();
+
+      // suppression de la variante elle-même du produit
+      $variant->delete();
+    }
+  }
+  
+  
+  
 }
 
 

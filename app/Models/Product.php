@@ -75,4 +75,9 @@ class Product extends Model
         $q->whereIn('id', $valueIds);
       }]);
   }
+
+  public function variants(): HasMany
+  {
+    return $this->hasMany(ProductVariant::class);
+  }
 }
