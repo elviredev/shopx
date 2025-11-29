@@ -143,6 +143,7 @@
 
           <!--- Overview -->
           <div class="card">
+            <div class="disabled-placeholder" style="{{ count($product->attributes) ? '' : 'display: none' }}"></div>
             <div class="card-header">Overview</div>
             <div class="card-body">
               <div class="row">
@@ -269,7 +270,7 @@
                   @endforeach
                 </div>
 
-                <button class="btn btn-primary mt-3" id="add-attribute-btn">Add Attribute</button>
+                <button type="button" class="btn btn-primary mt-3" id="add-attribute-btn">Add Attribute</button>
               </div>
             </div>
           </div>
@@ -481,7 +482,7 @@
             </div>
           </div>
 
-          <div class="card mb-3">
+          <div class="card mb-3" style="position: sticky; top: 0;">
             <div class="card-body">
               <div class="col-md-12">
                 <div class="mb-3 row">
@@ -805,6 +806,11 @@
         const productId = $(this).data('product-id')
         const attributeId = $(this).data('attribute-id')
 
+        if(!attributeId) {
+          $accordionItem.remove()
+          return
+        }
+
         // sweetalert2 pour confirmer la suppression
         Swal.fire({
           title: "Are you sure?",
@@ -826,6 +832,8 @@
               },
               success: function (response) {
                 $('#accordion-default').html(response.html)
+                $('#accordion-variant').html(response.variantHtml)
+                response.html ? $('.disabled-placeholder').show() : $('.disabled-placeholder').hide()
                 notyf.success(response.message)
               },
               error: function (xhr, status, error) {
@@ -851,6 +859,8 @@
           success: function (response) {
             $('#accordion-default').html(response.html)
             $('#accordion-variant').html(response.variantHtml)
+            response.html ? $('.disabled-placeholder').show() : $('.disabled-placeholder').hide()
+
             initColorPickersInContainer($('#accordion-default'))
             notyf.success(response.message)
           },
@@ -986,7 +996,7 @@
           contentType: false,
           processData: false,
           success: function (response) {
-            console.log(response);
+            window.location.href = response.redirect_url
           },
           error: function (xhr, status, error) {
             console.log(xhr);

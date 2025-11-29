@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @des permet d'éviter le soulignement rouge de phpstorm sur la relation "attributes"
+ * @property $attributes
+ */
+
 class Product extends Model
 {
   public function categories(): BelongsToMany

@@ -1,7 +1,8 @@
 <div class="accordion-item">
   <div class="accordion-header">
     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#variant-{{ $variant->id }}" aria-expanded="false">
-      {{ $variant->name }}
+      {{ $variant->name }} @if($variant->is_default == 1) <span class="badge bg-info text-white">default</span> @endif @if($variant->is_active == 1) <span class="badge bg-success text-white">active</span> @endif
+
       <div class="accordion-button-toggle">
         <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-down -->
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">

@@ -14,6 +14,7 @@ use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\Store;
 use App\Models\Tag;
+use App\Services\AlertService;
 use App\Traits\FileUploadTrait;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -128,10 +129,13 @@ class ProductController extends Controller
     /** Attach tags to the product */
     $product->tags()->sync($request->tags);
 
+    AlertService::created();
+
     return response()->json([
       'id' => $product->id,
       'status' => 'success',
       'message' => 'Product updated successfully.',
+      'redirect_url' => route('admin.products.index')
     ]);
   }
 
@@ -343,22 +347,32 @@ class ProductController extends Controller
       $attribute = Attribute::findOrFail($attributeId);
 
       $this->clearAttributeData($attribute, $product);
+      $this->regenerateProductVariants($product);
 
       $product->refresh();
 
       // récupérer les valeurs des attributs pour le produit passé en paramètre
       $attributes = $product->attributesWithValues;
 
+      // supprimer l'attribut lui-même
+      $attribute->delete();
+
       $html = '';
+      $variantHtml = '';
 
       foreach ($attributes as $attribute) {
         // passer les attributs à la vue
         $html .= view('admin.product.partials.attribute', compact('attribute', 'product'))->render();
       }
 
+      foreach ($product->variants as $variant) {
+        $variantHtml .= view('admin.product.partials.variant', compact('variant'))->render();
+      }
+
       return response()->json([
         'message' => 'Attributes deleted successfully.',
         'html' => $html,
+        'variantHtml' => $variantHtml
       ]);
     } catch (\Throwable $th) {
       return response()->json(['error' => $th->getMessage()], 500);
@@ -380,7 +394,7 @@ class ProductController extends Controller
     $attributeGroups = $this->getAttributeGroups($product);
 
     if ($attributeGroups->isEmpty()) {
-      throw new \Exception('No attribute values found for varaint génération');
+      return;
     }
 
     // Créer des combinaisons possibles pour les attributs
@@ -462,7 +476,7 @@ class ProductController extends Controller
    * @desc Créer une variante en base
    * @param Product $product
    * @param array $combination
-   * @return ProductVariant*
+   * @return ProductVariant
    */
   public function createSingleVariant(Product $product, array $combination)
   {
@@ -473,7 +487,8 @@ class ProductController extends Controller
       'name' => $variantName,
       'price' => 0,
       'sku' => '',
-      'qty' => 0
+      'qty' => 0,
+      'is_active' => 1,
     ]);
   }
 
@@ -495,6 +510,12 @@ class ProductController extends Controller
   }
 
 
+  /**
+   * @desc Update variants
+   * @param Request $request
+   * @param int $product
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function updateVariants(Request $request, int $product)
   {
     $request->validate([
