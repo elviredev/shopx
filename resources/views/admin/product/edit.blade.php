@@ -119,7 +119,10 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Short description</label>
-                  <textarea name="short_description" id="short-editor" >{!! $product->short_description !!}</textarea>
+                  <div id="short-editor-wrapper" style="display:none;">
+                    <textarea name="short_description" id="short-editor"></textarea>
+                  </div>
+                  {{-- <textarea name="short_description" id="short-editor" >{!! $product->short_description !!}</textarea>--}}
                   <x-input-error :messages="$errors->get('short_description')" />
                 </div>
               </div>
@@ -127,7 +130,10 @@
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Content</label>
-                  <textarea name="description" id="editor" >{!! $product->description !!}</textarea>
+                  <div id="editor-wrapper" style="display:none;">
+                    <textarea name="description" id="editor"></textarea>
+                  </div>
+                  {{-- <textarea name="description" id="editor" >{!! $product->description !!}</textarea>--}}
                   <x-input-error :messages="$errors->get('description')" />
                 </div>
               </div>
@@ -275,7 +281,9 @@
             <div class="card-body">
               <div class="col-md-12">
                 <div class="accordion" id="accordion-variant">
-                  @include('admin.product.partials.variant')
+                  @foreach($variants as $variant)
+                    @include('admin.product.partials.variant', ['variant' => $variant])
+                  @endforeach
                 </div>
               </div>
             </div>
@@ -497,6 +505,14 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
   {{-- CDN simonwep Color Picker --}}
   <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr"></script>
+
+  {{-- Partie Editor TinyMCE --}}
+  <script>
+    window.productContent = {
+      description: @json($product->description ?? ''),
+      short_description: @json($product->short_description ?? '')
+    };
+  </script>
 
   {{-- Partie Attributes --}}
   <script>
@@ -834,6 +850,7 @@
           data: data,
           success: function (response) {
             $('#accordion-default').html(response.html)
+            $('#accordion-variant').html(response.variantHtml)
             initColorPickersInContainer($('#accordion-default'))
             notyf.success(response.message)
           },
@@ -846,6 +863,37 @@
       $(document).ready(function () {
         initColorPickersInContainer($('#accordion-default'))
       })
+
+      // checkbox Manage Stock (variant)
+      $(document).on('change', '.variant-manage-stock', function () {
+        const isChecked = $(this).is(':checked')
+        $(this).closest('.col-md-12').find('.variant-quantity').toggle(isChecked)
+      })
+
+      // soumission du formulaire de variant
+      $(document).on('click','.variant-save-btn', function (e) {
+        e.preventDefault()
+
+        const form = $(this).closest('.variant-form')
+        const data = form.serialize()
+
+        $.ajax({
+          url: "{{ route('admin.products.variants.update', ':productid') }}".replace(':productid', '{{ $product->id }}'),
+          method: 'POST',
+          data: data,
+          success: function (response) {
+            notyf.success(response.message)
+          },
+          error: function (xhr, status, error) {
+            const errors = xhr.responseJSON.errors
+            $.each(errors, function (key, value) {
+              notyf.error(errors[key][0])
+            })
+          }
+        })
+      })
+
+
 
     })
   </script>

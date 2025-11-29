@@ -89,9 +89,9 @@ class ProductController extends Controller
     $categories = Category::getNested();
 
     $attributesWithValues = $product?->attributesWithValues ?? [];
-    // dd($attributesWithValues);
+    $variants = $product?->variants ?? [];
 
-    return view('admin.product.edit', compact('stores', 'brands', 'tags', 'categories', 'product', 'productCategoryIds', 'productTagsIds', 'attributesWithValues'));
+    return view('admin.product.edit', compact('stores', 'brands', 'tags', 'categories', 'product', 'productCategoryIds', 'productTagsIds', 'attributesWithValues', 'variants'));
   }
 
   /**
@@ -318,15 +318,21 @@ class ProductController extends Controller
     $attributes = $product->attributesWithValues;
 
     $html = '';
+    $variantHtml = '';
 
     foreach ($attributes as $attribute) {
       // passer les attributs à la vue
       $html .= view('admin.product.partials.attribute', compact('attribute', 'product'))->render();
     }
 
+    foreach ($product->variants as $variant) {
+      $variantHtml .= view('admin.product.partials.variant', compact('variant'))->render();
+    }
+
     return response()->json([
       'message' => 'Attributes generated successfully.',
       'html' => $html,
+      'variantHtml' => $variantHtml,
     ]);
   }
 
@@ -486,6 +492,36 @@ class ProductController extends Controller
         'attribute_value_id' => $attributeValue->id
       ]);
     }
+  }
+
+
+  public function updateVariants(Request $request, int $product)
+  {
+    $request->validate([
+      'variant_sku' => ['nullable', 'string', 'max:255'],
+      'variant_price' => ['required', 'numeric'],
+      'variant_special_price' => ['nullable', 'numeric'],
+      'variant_manage_stock' => ['nullable', 'boolean'],
+      'variant_qty' => ['nullable', 'numeric'],
+      'variant_stock_status' => ['required', 'in:in_stock,out_of_stock'],
+      'variant_is_default' => ['nullable', 'boolean'],
+      'variant_is_active' => ['nullable', 'boolean'],
+    ]);
+
+    $product = Product::findOrFail($product);
+    $variant = ProductVariant::findOrFail($request->variant_id);
+
+    $variant->sku = $request->variant_sku;
+    $variant->price = $request->variant_price;
+    $variant->special_price = $request->variant_special_price;
+    $variant->manage_stock = $request->variant_manage_stock ? 1 : 0;
+    $variant->qty = $request->variant_qty;
+    $variant->in_stock = $request->variant_stock_status == 'in_stock' ? 1 : 0;
+    $variant->is_default = $request->variant_is_default ?? 0;
+    $variant->is_active = $request->variant_is_active ?? 0;
+    $variant->save();
+
+    return response()->json(['message' => 'Variant updated successfully.']);
   }
 
   /**

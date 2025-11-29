@@ -118,6 +118,10 @@ Route::middleware('auth:admin')
   Route::delete('/products/attributes/{product}/{attribute}', [ProductController::class, 'destroyAttribute'])
     ->name('products.attributes.destroy');
 
+  /** Products Variants Routes */
+  Route::post('/products/variants/{product}/update', [ProductController::class, 'updateVariants'])
+    ->name('products.variants.update');
+
   /** Settings Routes */
   route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
   route::put('/settings/general-settings', [SettingController::class, 'generalSettings'])->name('settings.general');

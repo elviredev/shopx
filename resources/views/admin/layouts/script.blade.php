@@ -11,7 +11,16 @@
       'bold italic backcolor | alignleft aligncenter ' +
       'alignright alignjustify | bullist numlist outdent indent | ' +
       'removeformat | help',
-    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+    // empêcher le flash
+    setup(editor) {
+      editor.on('init', function () {
+        editor.setContent(window.productContent.description || '');
+        // Afficher le wrapper quand TinyMCE est prêt
+        document.querySelector('#editor-wrapper').style.display = 'block';
+      });
+    }
+
   });
 
   /** tinymce init pour product short description */
@@ -26,8 +35,17 @@
       'bold italic backcolor | alignleft aligncenter ' +
       'alignright alignjustify | bullist numlist outdent indent | ' +
       'removeformat | help',
-    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+    // empêcher le flash
+    setup(editor) {
+      editor.on('init', function () {
+        editor.setContent(window.productContent.short_description || '');
+        // Afficher le wrapper quand TinyMCE est prêt
+        document.querySelector('#short-editor-wrapper').style.display = 'block';
+      });
+    }
   });
+
 
   /** sweetalert2 init */
   $(function () {
