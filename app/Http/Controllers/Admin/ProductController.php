@@ -29,7 +29,8 @@ class ProductController extends Controller
 
   public function index(): View
   {
-    return view('admin.product.index');
+    $products = Product::latest()->paginate(30);
+    return view('admin.product.index', compact('products'));
   }
 
   public function create(): View
@@ -139,6 +140,7 @@ class ProductController extends Controller
     ]);
   }
 
+
   /** =================== Product Image ==================== */
   public function uploadImages(Request $request, Product $product)
   {
@@ -181,6 +183,7 @@ class ProductController extends Controller
       ProductImage::where('id', $image['id'])->update(['order' => $image['order']]);
     }
   }
+
 
   /** =================== Product Attributes ==================== */
 
@@ -340,6 +343,12 @@ class ProductController extends Controller
     ]);
   }
 
+  /**
+   * @desc Supprime un attribut
+   * @param int $productId
+   * @param int $attributeId
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function destroyAttribute(int $productId, int $attributeId)
   {
     try {
@@ -378,6 +387,9 @@ class ProductController extends Controller
       return response()->json(['error' => $th->getMessage()], 500);
     }
   }
+
+
+  /** =================== Product Variants ==================== */
 
   /**
    * @desc Méthode principale qui orchestre toute la génération des variantes
@@ -457,7 +469,6 @@ class ProductController extends Controller
     return $result;
   }
 
-
   /**
    * @desc Créer les variantes et attacher leurs attributs
    * @param Product $product
@@ -508,7 +519,6 @@ class ProductController extends Controller
       ]);
     }
   }
-
 
   /**
    * @desc Update variants

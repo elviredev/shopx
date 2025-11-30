@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @des permet d'éviter le soulignement rouge de phpstorm sur la relation "attributes"
@@ -21,6 +23,11 @@ class Product extends Model
   public function tags(): BelongsToMany
   {
     return $this->belongsToMany(Tag::class);
+  }
+
+  public function primaryImage(): HasOne
+  {
+    return $this->hasOne(ProductImage::class)->orderBy('order');
   }
 
   public function images(): HasMany
@@ -84,5 +91,15 @@ class Product extends Model
   public function variants(): HasMany
   {
     return $this->hasMany(ProductVariant::class);
+  }
+
+  public function primaryVariant():HasOne
+  {
+    return $this->hasOne(ProductVariant::class)->where('is_default', 1);
+  }
+
+  public function store(): BelongsTo
+  {
+    return $this->belongsTo(Store::class);
   }
 }

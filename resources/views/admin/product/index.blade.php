@@ -23,31 +23,113 @@
             <thead>
             <tr>
               <th>N°</th>
-              <th>Role Name</th>
-              <th>Permissions</th>
+              <th>Image</th>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Stock Status</th>
+              <th>Quantity</th>
+              <th>Created At</th>
+              <th>Status</th>
+              <th>Store</th>
               <th class="w-1"></th>
             </tr>
             </thead>
             <tbody>
-{{--            @forelse($roles as $role)--}}
-{{--              <tr>--}}
-{{--                <td>{{ $loop->iteration }}</td>--}}
-{{--                <td>{{ $role->name }}</td>--}}
-{{--                <td><span class="badge bg-primary-lt">{{ $role->permissions_count }}</span></td>--}}
-{{--                <td>--}}
-{{--                  @if($role->name !== "Super Admin")--}}
-{{--                    <div class="d-flex gap-2">--}}
-{{--                      <a class="btn btn-sm btn-primary" href="{{ route('admin.role.edit', $role) }}">Edit</a>--}}
-{{--                      <a class="btn btn-sm btn-danger delete-item" href="{{ route('admin.role.destroy', $role) }}">Delete</a>--}}
-{{--                    </div>--}}
-{{--                  @endif--}}
-{{--                </td>--}}
-{{--              </tr>--}}
-{{--            @empty--}}
-{{--              <tr>--}}
-{{--                <td colspan="4" class="text-center">No Roles</td>--}}
-{{--              </tr>--}}
-{{--            @endforelse--}}
+            @forelse($products as $product)
+              <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>
+                  <img src="{{ asset($product->primaryImage?->path) }}" style="width: 50px" alt=""></td>
+                <td>
+                  <div>
+                    <a href="{{ route('admin.products.edit', $product->id) }}">{{ $product->name }}</a>
+                  </div>
+                  <small class="text-muted text-sm text-capitalize">{{ $product->product_type }}</small>
+                </td>
+                <td>
+                  @if($product->primaryVariant)
+                    @if($product->primaryVariant?->special_price > 0)
+                      <div>{{ $product->primaryVariant?->special_price }}</div>
+                      <div class="text-danger text-sm" style="text-decoration: line-through">
+                        {{ $product->primaryVariant?->price }}
+                      </div>
+                    @else
+                      <div>{{ $product->primaryVariant?->price }}</div>
+                    @endif
+                  @else
+                    @if($product->special_price > 0)
+                    <div>{{ $product->special_price }}</div>
+                    <div class="text-danger text-sm" style="text-decoration: line-through">
+                      {{ $product->price }}
+                    </div>
+                    @else
+                      <div>{{ $product->price }}</div>
+                    @endif
+                  @endif
+                </td>
+
+                <td>
+                  @if($product->primaryVariant)
+                    @if($product->primaryVariant?->in_stock == 1)
+                      <small class="text-success">In Stock</small>
+                    @else
+                      <small class="text-danger">Out of Stock</small>
+                    @endif
+                  @else
+                    @if($product->in_stock == 1)
+                      <small class="text-success">In Stock</small>
+                    @else
+                      <small class="text-danger">Out of Stock</small>
+                    @endif
+                  @endif
+                </td>
+
+                <td>
+                  @if($product->primaryVariant)
+                    @if($product->primaryVariant->manage_stock == 1)
+                      {{ $product->primaryVariant->qty }}
+                      @else
+                        ∞
+                    @endif
+                  @else
+                    @if($product->manage_stock == 'yes')
+                      {{ $product->qty }}
+                    @else
+                      ∞
+                    @endif
+                  @endif
+                </td>
+
+                <td>
+                  {{ date('Y-m-d', strtotime($product->created_at)) }}
+                </td>
+
+                <td>
+                  @if($product->status == 'active')
+                    <span class="badge bg-success-lt">Active</span>
+                  @elseif($product->status == 'inactive')
+                    <span class="badge bg-secondary-lt">Inactive</span>
+                  @elseif($product->status == 'pending')
+                    <span class="badge bg-warning-lt">Pending</span>
+                  @elseif($product->status == 'draft')
+                    <span class="badge bg-secondary-lt">Draft</span>
+                  @endif
+                </td>
+
+                <td>{{ $product->store->name }}</td>
+
+                <td>
+                  <div class="d-flex gap-2">
+                    <a class="btn btn-sm btn-primary" href="{{ route('admin.products.edit', $product->id) }}">Edit</a>
+                    <a class="btn btn-sm btn-danger delete-item" href="">Delete</a>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="4" class="text-center">No Roles</td>
+              </tr>
+            @endforelse
             </tbody>
           </table>
         </div>

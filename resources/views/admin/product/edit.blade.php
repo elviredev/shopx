@@ -92,12 +92,12 @@
       <div class="row">
         <div class="col-md-8">
           <div class="card mb-3">
-            {{--          <div class="card-header">--}}
-            {{--            <h3 class="card-title">Create Role</h3>--}}
-            {{--            <div class="card-actions">--}}
-            {{--              <a href="{{ route('admin.role.index') }}" class="btn btn-secondary">Back</a>--}}
-            {{--            </div>--}}
-            {{--          </div>--}}
+            {{-- <div class="card-header">--}}
+            {{-- <h3 class="card-title">Create Role</h3>--}}
+            {{-- <div class="card-actions">--}}
+            {{-- <a href="{{ route('admin.role.index') }}" class="btn btn-secondary">Back</a>--}}
+            {{-- </div>--}}
+            {{-- </div>--}}
             <div class="card-body">
 
               <div class="col-md-12">
