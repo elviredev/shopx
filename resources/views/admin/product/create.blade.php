@@ -503,7 +503,7 @@
       // Ajax Request
       $.ajax({
         method: "POST",
-        url: "{{ route('admin.products.store') }}",
+        url: "{{ route('admin.products.store', ['type' => ':type']) }}".replace(':type', '{{ request()->type }}'),
         data: data,
         contentType: false,
         processData: false,

@@ -104,8 +104,8 @@ Route::middleware('auth:admin')
 
   /** Products Routes */
   Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-  Route::get('/products/physical/create', [ProductController::class, 'create'])->name('products.create');
-  Route::post('/products/physical/create', [ProductController::class, 'store'])->name('products.store');
+  Route::get('/products/{type}/create', [ProductController::class, 'create'])->name('products.create');
+  Route::post('/products/{type}/create', [ProductController::class, 'store'])->name('products.store');
   Route::get('/products/physical/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
   Route::post('/products/physical/{product}/update', [ProductController::class, 'update'])->name('products.update');
   Route::post('/products/images/upload/{product}', [ProductController::class, 'uploadImages'])->name('products.images.upload');
@@ -121,6 +121,9 @@ Route::middleware('auth:admin')
   /** Products Variants Routes */
   Route::post('/products/variants/{product}/update', [ProductController::class, 'updateVariants'])
     ->name('products.variants.update');
+
+  /** Digital Products Routes */
+  Route::get('/products/digital/{product}/edit', [ProductController::class, 'editDigitalProduct'])->name('digital.products.edit');
 
   /** Settings Routes */
   route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

@@ -43,11 +43,14 @@ class ProductController extends Controller
     return view('admin.product.create', compact('stores', 'brands', 'tags', 'categories'));
   }
 
-  public function store(ProductStoreRequest $request)
+  public function store(ProductStoreRequest $request, string $type)
   {
+    if (!in_array($type, ['physical', 'digital'])) abort(404);
+
     $product = new Product();
     $product->name = $request->name;
     $product->slug = $request->slug;
+    $product->product_type = $type;
     $product->short_description = $request->short_description;
     $product->description = $request->description;
     $product->sku = $request->sku;
@@ -72,12 +75,21 @@ class ProductController extends Controller
     /** Attach tags to the product */
     $product->tags()->sync($request->tags);
 
-    return response()->json([
-      'id' => $product->id,
-      'redirect_url' => route('admin.products.edit', $product->id) .'#product-images',
-      'status' => 'success',
-      'message' => 'Product created successfully.',
-    ]);
+    if ($type == 'physical') {
+      return response()->json([
+        'id' => $product->id,
+        'redirect_url' => route('admin.products.edit', $product->id) .'#product-images',
+        'status' => 'success',
+        'message' => 'Product created successfully.',
+      ]);
+    } else {
+      return response()->json([
+        'id' => $product->id,
+        'redirect_url' => route('admin.digital.products.edit', $product->id) .'#product-images',
+        'status' => 'success',
+        'message' => 'Digital product created successfully.',
+      ]);
+    }
   }
 
   public function edit(int $id)
@@ -94,6 +106,22 @@ class ProductController extends Controller
     $variants = $product?->variants ?? [];
 
     return view('admin.product.edit', compact('stores', 'brands', 'tags', 'categories', 'product', 'productCategoryIds', 'productTagsIds', 'attributesWithValues', 'variants'));
+  }
+
+  public function editDigitalProduct(int $id)
+  {
+    $product = Product::findOrFail($id);
+
+    if ($product->product_type != 'digital') abort(404);
+
+    $productCategoryIds = $product->categories->pluck('id')->toArray();
+    $productTagsIds = $product->tags->pluck('id')->toArray();
+    $stores = Store::select(['id', 'name'])->get();
+    $brands = Brand::select(['id', 'name'])->where('is_active', 1)->get();
+    $tags = Tag::where('is_active', 1)->get();
+    $categories = Category::getNested();
+
+    return view('admin.product.digital-edit', compact('stores', 'brands', 'tags', 'categories', 'product', 'productCategoryIds', 'productTagsIds'));
   }
 
   /**

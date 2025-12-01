@@ -11,8 +11,8 @@
               Create Product
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{{ route('admin.products.create') }}">Physical</a></li>
-              <li><a class="dropdown-item" href="#">Digital</a></li>
+              <li><a class="dropdown-item" href="{{ route('admin.products.create', ['type' => 'physical']) }}">Physical</a></li>
+              <li><a class="dropdown-item" href="{{ route('admin.products.create', ['type' => 'digital']) }}">Digital</a></li>
             </ul>
           </div>
         </div>
