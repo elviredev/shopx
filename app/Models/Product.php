@@ -102,4 +102,9 @@ class Product extends Model
   {
     return $this->belongsTo(Store::class);
   }
+
+  public function files(): HasMany
+  {
+    return $this->hasMany(ProductFile::class);
+  }
 }

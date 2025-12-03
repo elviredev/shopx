@@ -7,79 +7,131 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
 
   <style>
-    .dropzone {
-      border: 2px dashed #ccc;
-      border-radius: 4px;
-      padding: 20px;
-      text-align: center;
-      background: #f8f9fa;
-      margin-bottom: 20px;
-    }
+  /* Dropzone Images Upload */
+  .dropzone {
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    margin-bottom: 20px;
+  }
 
-    .dropzone.dz-drag-hover {
-      border-color: #2196F3;
-      background: #e3f2fd;
-    }
+  .dropzone.dz-drag-hover {
+    border-color: #2196F3;
+    background: #e3f2fd;
+  }
 
-    .image-preview-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
+  .image-preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
 
-    .image-preview-item {
-      position: relative;
-      padding: 5px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: move;
-    }
+  .image-preview-item {
+    position: relative;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: move;
+  }
 
-    .image-preview-item img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
+  .image-preview-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
 
-    .image-preview-item .remove-image {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: red;
-      color: white;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      text-align: center;
-      line-height: 24px;
-      cursor: pointer;
-    }
+  .image-preview-item .remove-image {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    cursor: pointer;
+  }
 
-    .image-preview-loader {
-      position: relative;
-      width: 100%;
-      height: 150px;
-      background: #f8f9fa;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: pulse 1.5s infinite;
-    }
+  .image-preview-loader {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 1.5s infinite;
+  }
 
-    .image-preview-loader::after {
-      content: "Uploading...";
-      color: #666;
-    }
+  .image-preview-loader::after {
+    content: "Uploading...";
+    color: #666;
+  }
 
-    @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
-    }
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+
+  /* Dropzone Files Upload */
+  .dz-preview {
+    position: relative;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    border-radius: 6px;
+    text-align: left;
+    font-family: sans-serif;
+  }
+
+  .dz-filename {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .dz-progress {
+    height: 6px;
+    background: #e4e4e4;
+    margin-top: 6px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .dz-upload {
+    background: #28a745;
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease;
+  }
+
+  .dz-percentage {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #555;
+  }
+
+  .dz-remove {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 18px;
+    color: #dc3545;
+    cursor: pointer;
+  }
+
+  .dz-remove:hover {
+    color: #a71d2a;
+  }
   </style>
 @endpush
 
@@ -253,6 +305,32 @@
               </div>
             </div>
           </div>
+
+          <div class="card mt-3" id="product-images">
+            <div class="card-header">
+              <h3 class="card-title">Product Files</h3>
+            </div>
+            <div class="card-body">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <div class="dropzone" id="fileUploader"></div>
+                  <div class="file-preview-container" id="filePreviewContainer">
+                    @foreach($product->files ?? [] as $file)
+                      <div class="dz-preview dz-file-preview">
+                        <div class="dz-filename"><span data-dz-name>{{ $file->filename }}</span></div>
+                        <div class="dz-progress">
+                          <div class="dz-upload" data-dz-uploadprogress style="width: 100%;"></div>
+                        </div>
+                        <div class="dz-percentage">uploaded</div>
+                        <div class="dz-remove" data-file-id="{{ $file->id }}" data-dz-remove>&times;</div>
+                      </div>
+                    @endforeach
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!--- Options -->
@@ -608,6 +686,68 @@
           this.removeFile(file)
         })
       }
+    })
+
+    // dropzone upload chunking files
+    const fileUploader = new Dropzone('#fileUploader', {
+      url: "{{ route('admin.digital-products.file-upload') }}",
+      paramName: "file",
+      maxFilesize: 1000, // 1GB max file size
+      chunking: true,
+      forceChunking: true,
+      chunkSize: 1024 * 1024, // 1MB par chunk
+      parallelUploads: 1,
+      // acceptedFiles: "image/*",
+      addRemoveLinks: false,
+      autoProcessQueue: true,
+      uploadMultiple: false,
+      previewsContainer: `#filePreviewContainer`,
+      previewTemplate:
+        `<div class="dz-preview dz-file-preview">
+          <div class="dz-filename"><span data-dz-name></span></div>
+          <div class="dz-progress"><div class="dz-upload" data-dz-uploadprogress></div></div>
+          <div class="dz-percentage"><span class="progress-text">0</span>% uploaded</div>
+          <div class="dz-remove" data-dz-remove>&times;</div>
+        </div>`,
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      init: function() {
+        this.on("uploadprogress", function(file, progress) {
+          file.previewElement.querySelector(".progress-text").textContent = progress.toFixed(0);
+        })
+
+        this.on("sending", function(file, xhr, formData) {
+          formData.append('name', file.upload.filename)
+          formData.append('product_id', '{{ $product->id }}')
+        })
+
+        this.on("success", function(file, response) {
+          window.location.reload();
+        })
+
+        this.on("error", function(file, response) {
+          console.error(response)
+        })
+      }
+    })
+
+    // delete file from bdd et storage
+    $(document).on('click', '.dz-remove', function() {
+      const id = $(this).attr('data-file-id')
+      $.ajax({
+        method: "DELETE",
+        url: "{{ route('admin.digital-products.file.destroy', [':productId', ':id']) }}".replace(':id', id).replace(':productId', '{{ $product->id }}'),
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        success: function (response) {
+          window.location.reload();
+        },
+        error: function (xhr, status, error) {
+          console.log(xhr);
+        }
+      })
     })
 
     // add upload preview to DOM

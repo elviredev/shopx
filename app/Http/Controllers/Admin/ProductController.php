@@ -10,6 +10,7 @@ use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductFile;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\Store;
@@ -20,6 +21,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -85,7 +88,7 @@ class ProductController extends Controller
     } else {
       return response()->json([
         'id' => $product->id,
-        'redirect_url' => route('admin.digital.products.edit', $product->id) .'#product-images',
+        'redirect_url' => route('admin.digital-products.edit', $product->id) .'#product-images',
         'status' => 'success',
         'message' => 'Digital product created successfully.',
       ]);
@@ -122,6 +125,105 @@ class ProductController extends Controller
     $categories = Category::getNested();
 
     return view('admin.product.digital-edit', compact('stores', 'brands', 'tags', 'categories', 'product', 'productCategoryIds', 'productTagsIds'));
+  }
+
+  /**
+   * @desc Upload digital product file
+   * @param Request $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function uploadDigitalProductFile(Request $request)
+  {
+    // récupérer les éléments depuis la requête
+    $file = $request->file('file');
+    $chunkIndex = $request->dzchunkindex;
+    $totalChunks = $request->dztotalchunkcount;
+    $fileName = $request->name;
+
+    // stockage des segments
+    $chunkFolder = storage_path('app/private/chunks/' . $fileName);
+    if (!file_exists($chunkFolder)) mkdir($chunkFolder, 0777, true);
+
+    $chunkPath = $chunkFolder . '/' . $chunkIndex;
+
+    // stocker les segments dans les fichiers temporaires du dossier "chunks"
+    file_put_contents($chunkPath, file_get_contents($file->getRealPath()));
+
+    // fusionner les segments
+    // si c'est le dernier segment
+    if($chunkIndex == $totalChunks - 1){
+      // générer un nom de fichier unique
+      $finalFileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+      // lieu de stockage du fichier final
+      $finalPath = storage_path('app/private/uploads/' . $finalFileName);
+      // ouvrir le fichier et l'ecrire (contenu du fichier final)
+      $output = fopen($finalPath, 'ab');
+
+      // parcourir tous les segments, les lire et écrire toutes leurs valeurs dans un seul fichier
+      for($i = 0; $i < $totalChunks; $i++){
+        $chunkFile = $chunkFolder . '/' . $i;
+        // ouvrir le fichier et le lire (contenu du segment)
+        $input = fopen($chunkFile, 'rb');
+        // obtenir le contenu du fichier (input) et l'ajouter au fichier final (output)
+        stream_copy_to_stream($input, $output);
+        // fermer le fichier
+        fclose($input);
+        // dissocier le segment du fichier final
+        unlink($chunkFile);
+      }
+
+      fclose($output);
+
+      // supprimer les fichiers inutiles
+      rmdir($chunkFolder);
+
+      // stocker le fichier en bdd
+      $this->storeDigitalFile($file, $request->product_id, $fileName, $finalFileName);
+
+      return response()->json(['status' => 'success']);
+    }
+
+    return response()->json(['status' => 'chunk_received']);
+  }
+
+  /**
+   * @desc Store digital product file
+   * @param $file
+   * @param $product_id
+   * @param $fileName
+   * @param $finalFileName
+   * @return void
+   */
+  public function storeDigitalFile($file, $product_id, $fileName, $finalFileName)
+  {
+    $productFile = new ProductFile();
+    $productFile->product_id = $product_id;
+    $productFile->filename = $fileName;
+    $productFile->path = "uploads/" . $finalFileName;
+    $productFile->extension = $file->getClientOriginalExtension();
+    $productFile->size = $file->getSize();
+    $productFile->save();
+  }
+
+  public function destroyDigitalProductFile(int $productId, int $id)
+  {
+    try {
+      // si on trouve l'id on supprime le fichier sinon erreur 404 renvoyée au user
+      $productFile = ProductFile::where('id', $id)
+                      ->where('product_id', $productId)
+                      ->firstOrFail();
+      // delete from storage
+      if(Storage::disk('local')->exists($productFile->path)) {
+        Storage::disk('local')->delete($productFile->path);
+      }
+
+      $productFile->delete();
+
+      return response()->json(['status' => 'success', 'message' => 'File deleted successfully.'], 200);
+    } catch (\Exception $e) {
+      logger('Failed to delete file' . $e);
+      return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+    }
   }
 
   /**
