@@ -692,12 +692,12 @@
     const fileUploader = new Dropzone('#fileUploader', {
       url: "{{ route('admin.digital-products.file-upload') }}",
       paramName: "file",
-      maxFilesize: 1000, // 1GB max file size
+      maxFilesize: 1024, // 1GB max file size
       chunking: true,
       forceChunking: true,
       chunkSize: 1024 * 1024, // 1MB par chunk
       parallelUploads: 1,
-      // acceptedFiles: "image/*",
+      acceptedFiles: ".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.mp4,.mov,.webm,.mp3,.wav,.ogg",
       addRemoveLinks: false,
       autoProcessQueue: true,
       uploadMultiple: false,
@@ -728,6 +728,9 @@
 
         this.on("error", function(file, response) {
           console.error(response)
+          if (response.status === 'error') {
+            notyf.error(response.message)
+          }
         })
       }
     })

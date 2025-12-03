@@ -149,7 +149,7 @@ class ProductController extends Controller
     // stocker les segments dans les fichiers temporaires du dossier "chunks"
     file_put_contents($chunkPath, file_get_contents($file->getRealPath()));
 
-    // fusionner les segments
+    /* fusionner les segments */
     // si c'est le dernier segment
     if($chunkIndex == $totalChunks - 1){
       // générer un nom de fichier unique
@@ -177,6 +177,13 @@ class ProductController extends Controller
       // supprimer les fichiers inutiles
       rmdir($chunkFolder);
 
+      // validation du fichier final
+      $validationResult = $this->validateFinalFile($finalPath);
+      if($validationResult !== true) {
+        unlink($finalPath);
+        return $validationResult;
+      }
+
       // stocker le fichier en bdd
       $this->storeDigitalFile($file, $request->product_id, $fileName, $finalFileName);
 
@@ -184,6 +191,76 @@ class ProductController extends Controller
     }
 
     return response()->json(['status' => 'chunk_received']);
+  }
+
+
+  public function validateFinalFile(string $finalPath)
+  {
+    $maxSizeMb = 1000;
+    $maxSizeBytes = $maxSizeMb * 1024 * 1024;
+
+    // vérifier taille du fichier
+    if(filesize($finalPath) > $maxSizeBytes){
+      return response()->json([
+        'status' => 'error',
+        'message' => 'File size exceeds the maximum allowed size of ' . $maxSizeMb . ' MB.'
+      ], 413);
+    }
+
+    // MIME validation
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $finalPath);
+    finfo_close($finfo);
+
+    // MIME type pris en charge
+    $allowedMimeTypes = [
+      'jpeg' => 'image/jpeg',
+      'jpg'  => 'image/jpeg',
+      'png'  => 'image/png',
+      'gif'  => 'image/gif',
+      'webp' => 'image/webp',
+      'svg'  => 'image/svg+xml',
+      'bmp'  => 'image/bmp',
+      'tiff' => 'image/tiff',
+
+      'pdf'  => 'application/pdf',
+
+      'doc'  => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+
+      'xls'  => 'application/vnd.ms-excel',
+      'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
+      'ppt'  => 'application/vnd.ms-powerpoint',
+      'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+
+      'txt'  => 'text/plain',
+      'csv'  => 'text/csv',
+      'md'   => 'text/markdown',
+
+      'mp3'  => 'audio/mpeg',
+      'wav'  => 'audio/wav',
+      'ogg'  => 'audio/ogg',
+      'm4a'  => 'audio/mp4',
+
+      'mp4'  => 'video/mp4',
+      'webm' => 'video/webm',
+      'avi'  => 'video/x-msvideo',
+      'mov'  => 'video/quicktime',
+      'mkv'  => 'video/x-matroska',
+
+      'zip'  => 'application/zip',
+      'rar'  => 'application/vnd.rar',
+      '7z'   => 'application/x-7z-compressed',
+      'tar'  => 'application/x-tar',
+      'gz'   => 'application/gzip',
+    ];
+
+    if (!in_array($mimeType, $allowedMimeTypes)) {
+      return response()->json(['status' => 'error', 'message' => 'Invalid file type'], 415);
+    }
+
+    return true;
   }
 
   /**
