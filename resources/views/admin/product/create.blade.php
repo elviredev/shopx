@@ -100,7 +100,7 @@
             <div class="col-md-12">
               <div class="mb-3">
                 <label class="form-label required">Name</label>
-                <input type="text" class="form-control" name="name">
+                <input type="text" class="form-control" id="name" name="name">
                 <x-input-error :messages="$errors->get('name')" />
               </div>
             </div>
@@ -108,7 +108,7 @@
             <div class="col-md-12">
               <div class="mb-3">
                 <label class="form-label required">Slug</label>
-                <input type="text" class="form-control" name="slug">
+                <input type="text" class="form-control" id="slug" name="slug">
                 <x-input-error :messages="$errors->get('slug')" />
               </div>
             </div>
@@ -523,6 +523,19 @@
 
     })
   })
+
+  // slug auto-generate
+  $('#name').on('input', function() {
+    $('#slug').val(slugify($(this).val()));
+  })
+
+  function slugify(text) {
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9\-]/g, '')
+      .replace(/\-+/g, '-')
+      .replace(/^\-+|\-+$/g, '')
+  }
 
 </script>
 @endpush

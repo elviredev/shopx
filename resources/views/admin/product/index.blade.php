@@ -42,7 +42,15 @@
                   <img src="{{ asset($product->primaryImage?->path) }}" style="width: 50px" alt=""></td>
                 <td>
                   <div>
-                    <a href="{{ route('admin.products.edit', $product->id) }}">{{ $product->name }}</a>
+                    @if($product->product_type == 'physical')
+                    <a href="{{ route('admin.products.edit', $product->id) }}">
+                      {{ $product->name }}
+                    </a>
+                    @else
+                      <a href="{{ route('admin.digital-products.edit', $product->id) }}">
+                        {{ $product->name }}
+                      </a>
+                    @endif
                   </div>
                   <small class="text-muted text-sm text-capitalize">{{ $product->product_type }}</small>
                 </td>
@@ -120,8 +128,12 @@
 
                 <td>
                   <div class="d-flex gap-2">
-                    <a class="btn btn-sm btn-primary" href="{{ route('admin.products.edit', $product->id) }}">Edit</a>
-                    <a class="btn btn-sm btn-danger delete-item" href="">Delete</a>
+                    @if($product->product_type == 'physical')
+                    <a class="btn btn-sm btn-primary p-1" href="{{ route('admin.products.edit', $product->id) }}"><i class="ti ti-edit"></i></a>
+                    @else
+                      <a class="btn btn-sm btn-primary p-1" href="{{ route('admin.digital-products.edit', $product->id) }}"><i class="ti ti-edit"></i></a>
+                    @endif
+                    <a class="btn btn-sm btn-danger p-1 delete-item" href="{{ route('admin.products.destroy', $product) }}"><i class="ti ti-trash"></i></a>
                   </div>
                 </td>
               </tr>

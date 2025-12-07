@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @des permet d'éviter le soulignement rouge de phpstorm sur la relation "attributes"
@@ -15,6 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
+  use SoftDeletes;
+
+  protected $guarded = [];
   public function categories(): BelongsToMany
   {
     return $this->belongsToMany(Category::class);

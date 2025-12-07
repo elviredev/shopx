@@ -19,14 +19,29 @@ use App\Services\AlertService;
 use App\Traits\FileUploadTrait;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
   use FileUploadTrait;
+
+  /**
+   * @desc Middleware pour vérifier l'autorisation d'accès aux méthodes du controller
+   * si user n'a pas la permission, il ne pourra pas accèder aux routes et vues du controller
+   * @return Middleware[]
+   */
+  static function Middleware(): array
+  {
+    return [
+      new Middleware('permission:Product Management')
+    ];
+  }
 
   /** =================== Product CRUD ==================== */
 
@@ -194,6 +209,7 @@ class ProductController extends Controller
   }
 
 
+  /** Validation du fichier final ayant été téléchargé */
   public function validateFinalFile(string $finalPath)
   {
     $maxSizeMb = 1000;
@@ -282,6 +298,12 @@ class ProductController extends Controller
     $productFile->save();
   }
 
+  /**
+   * @desc Delete digital product file
+   * @param int $productId
+   * @param int $id
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function destroyDigitalProductFile(int $productId, int $id)
   {
     try {
@@ -778,6 +800,23 @@ class ProductController extends Controller
       // suppression de la variante elle-même du produit
       $variant->delete();
     }
+  }
+
+  /**
+   * @desc Delete product
+   * @param Product $product
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function destroy(Product $product)
+  {
+    if (Auth::user()->hasRole('Super Admin') || hasPermission(['Product Management'])) {
+      $product->delete();
+      notyf()->success('Product deleted successfully.');
+      return response()->json(['status' => 'success', 'message' => 'Product deleted successfully.']);
+    }
+
+    notyf()->error('You do not have permission to delete this product.');
+    return response()->json(['status' => 'error', 'message' => 'You do not have permission to delete this product.']);
   }
   
   
