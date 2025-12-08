@@ -337,6 +337,24 @@
         <div class="col-md-4">
           <div class="card mb-3">
             <div class="card-header">
+              <h3 class="card-title">Approve Status</h3>
+            </div>
+            <div class="card-body">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <select name="approved_status" class="form-select" id="">
+                    <option @selected($product->approved_status == 'pending') value="pending">Pending</option>
+                    <option @selected($product->approved_status == 'approved') value="approved">Approved</option>
+                    <option @selected($product->approved_status == 'rejected') value="rejected">Rejected</option>
+                  </select>
+                  <x-input-error :messages="$errors->get('approved_status')" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-3">
+            <div class="card-header">
               <h3 class="card-title">Status</h3>
             </div>
             <div class="card-body">
@@ -346,7 +364,6 @@
                     <option @selected($product->status == 'active') value="active">Active</option>
                     <option @selected($product->status == 'inactive') value="inactive">Inactive</option>
                     <option @selected($product->status == 'draft') value="draft">Draft</option>
-                    <option @selected($product->status == 'pending') value="pending">Pending</option>
                   </select>
                   <x-input-error :messages="$errors->get('status')" />
                 </div>

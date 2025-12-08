@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('vendor-dashboard.layouts.app')
 
 @section('contents')
   <div class="container-xl">
@@ -11,8 +11,8 @@
               Create Product
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{{ route('admin.products.create', ['type' => 'physical']) }}">Physical</a></li>
-              <li><a class="dropdown-item" href="{{ route('admin.products.create', ['type' => 'digital']) }}">Digital</a></li>
+              <li><a class="dropdown-item" href="{{ route('vendor.products.create', ['type' => 'physical']) }}">Physical</a></li>
+              <li><a class="dropdown-item" href="{{ route('vendor.products.create', ['type' => 'digital']) }}">Digital</a></li>
             </ul>
           </div>
         </div>
@@ -44,11 +44,11 @@
                 <td>
                   <div>
                     @if($product->product_type == 'physical')
-                    <a href="{{ route('admin.products.edit', $product->id) }}">
+                    <a href="{{ route('vendor.products.edit', $product->id) }}">
                       {{ $product->name }}
                     </a>
                     @else
-                      <a href="{{ route('admin.digital-products.edit', $product->id) }}">
+                      <a href="{{ route('vendor.digital-products.edit', $product->id) }}">
                         {{ $product->name }}
                       </a>
                     @endif
@@ -140,11 +140,11 @@
                 <td>
                   <div class="d-flex gap-2">
                     @if($product->product_type == 'physical')
-                    <a class="btn btn-sm btn-primary p-1" href="{{ route('admin.products.edit', $product->id) }}"><i class="ti ti-edit"></i></a>
+                    <a class="btn btn-sm btn-primary p-1" href="{{ route('vendor.products.edit', $product->id) }}"><i class="ti ti-edit"></i></a>
                     @else
-                      <a class="btn btn-sm btn-primary p-1" href="{{ route('admin.digital-products.edit', $product->id) }}"><i class="ti ti-edit"></i></a>
+                      <a class="btn btn-sm btn-primary p-1" href="{{ route('vendor.digital-products.edit', $product->id) }}"><i class="ti ti-edit"></i></a>
                     @endif
-                    <a class="btn btn-sm btn-danger p-1 delete-item" href="{{ route('admin.products.destroy', $product) }}"><i class="ti ti-trash"></i></a>
+                    <a class="btn btn-sm btn-danger p-1 delete-item" href="{{ route('vendor.products.destroy', $product) }}"><i class="ti ti-trash"></i></a>
                   </div>
                 </td>
               </tr>

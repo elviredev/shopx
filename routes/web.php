@@ -34,6 +34,33 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
 
   /** Shop Profile routes */
   Route::resource('store-profile', StoreController::class);
+
+  /** Products Routes */
+  Route::get('/products', [\App\Http\Controllers\Frontend\VendorProductController::class, 'index'])->name('products.index');
+  Route::get('/products/{type}/create', [\App\Http\Controllers\Frontend\VendorProductController::class, 'create'])->name('products.create');
+  Route::post('/products/{type}/create', [\App\Http\Controllers\Frontend\VendorProductController::class, 'store'])->name('products.store');
+  Route::get('/products/physical/{product}/edit', [\App\Http\Controllers\Frontend\VendorProductController::class, 'edit'])->name('products.edit');
+  Route::post('/products/physical/{product}/update', [\App\Http\Controllers\Frontend\VendorProductController::class, 'update'])->name('products.update');
+  Route::post('/products/images/upload/{product}', [\App\Http\Controllers\Frontend\VendorProductController::class, 'uploadImages'])->name('products.images.upload');
+  Route::delete('/products/images/{image}', [\App\Http\Controllers\Frontend\VendorProductController::class, 'destroyImage'])->name('products.images.destroy');
+  Route::post('/products/images/reorder', [\App\Http\Controllers\Frontend\VendorProductController::class, 'reorderImages'])->name('products.images.reorder');
+
+  /** Products Attributes Routes */
+  Route::post('/products/attributes/{product}/store', [\App\Http\Controllers\Frontend\VendorProductController::class, 'storeAttributes'])
+    ->name('products.attributes.store');
+  Route::delete('/products/attributes/{product}/{attribute}', [\App\Http\Controllers\Frontend\VendorProductController::class, 'destroyAttribute'])
+    ->name('products.attributes.destroy');
+
+  /** Products Variants Routes */
+  Route::post('/products/variants/{product}/update', [\App\Http\Controllers\Frontend\VendorProductController::class, 'updateVariants'])
+    ->name('products.variants.update');
+
+  /** Digital Products Routes */
+  Route::get('/products/digital/{product}/edit', [\App\Http\Controllers\Frontend\VendorProductController::class, 'editDigitalProduct'])->name('digital-products.edit');
+  Route::post('/products/digital/file-upload', [\App\Http\Controllers\Frontend\VendorProductController::class, 'uploadDigitalProductFile'])->name('digital-products.file-upload');
+  Route::delete('/products/digital/{product}/{file}', [\App\Http\Controllers\Frontend\VendorProductController::class, 'destroyDigitalProductFile'])->name('digital-products.file.destroy');
+
+  Route::delete('/products/{product}', [\App\Http\Controllers\Frontend\VendorProductController::class, 'destroy'])->name('products.destroy');
 });
 
 require __DIR__.'/auth.php';

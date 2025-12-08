@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('vendor-dashboard.layouts.app')
 
 @push('styles')
   {{-- CDN Dropzone Upload Fichier --}}
@@ -95,7 +95,7 @@
             {{-- <div class="card-header">--}}
             {{-- <h3 class="card-title">Create Role</h3>--}}
             {{-- <div class="card-actions">--}}
-            {{-- <a href="{{ route('admin.role.index') }}" class="btn btn-secondary">Back</a>--}}
+            {{-- <a href="{{ route('vendor.role.index') }}" class="btn btn-secondary">Back</a>--}}
             {{-- </div>--}}
             {{-- </div>--}}
             <div class="card-body">
@@ -263,7 +263,7 @@
 
                 <div class="accordion" id="accordion-default">
                   @foreach($attributesWithValues as $attribute)
-                    @include('admin.product.partials.attribute', [
+                    @include('vendor-dashboard.product.partials.attribute', [
                       'attribute' => $attribute,
                       'product' => $product
                     ])
@@ -283,7 +283,7 @@
               <div class="col-md-12">
                 <div class="accordion" id="accordion-variant">
                   @foreach($variants as $variant)
-                    @include('admin.product.partials.variant', ['variant' => $variant])
+                    @include('vendor-dashboard.product.partials.variant', ['variant' => $variant])
                   @endforeach
                 </div>
               </div>
@@ -293,24 +293,6 @@
 
         <!--- Options -->
         <div class="col-md-4">
-          <div class="card mb-3">
-            <div class="card-header">
-              <h3 class="card-title">Approve Status</h3>
-            </div>
-            <div class="card-body">
-              <div class="col-md-12">
-                <div class="mb-3">
-                  <select name="approved_status" class="form-select" id="">
-                    <option @selected($product->approved_status == 'pending') value="pending">Pending</option>
-                    <option @selected($product->approved_status == 'approved') value="approved">Approved</option>
-                    <option @selected($product->approved_status == 'rejected') value="rejected">Rejected</option>
-                  </select>
-                  <x-input-error :messages="$errors->get('approved_status')" />
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div class="card mb-3">
             <div class="card-header">
               <h3 class="card-title">Status</h3>
@@ -324,25 +306,6 @@
                     <option @selected($product->status == 'draft') value="draft">Draft</option>
                   </select>
                   <x-input-error :messages="$errors->get('status')" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card mb-3">
-            <div class="card-header">
-              <h3 class="card-title">Store</h3>
-            </div>
-            <div class="card-body">
-              <div class="col-md-12">
-                <div class="mb-3">
-                  <select name="store" class="form-select select2" id="">
-                    <option value="">Select a store</option>
-                    @foreach($stores as $store)
-                      <option @selected($product->store_id == $store->id) value="{{ $store->id }}">{{ $store->name }}</option>
-                    @endforeach
-                  </select>
-                  <x-input-error :messages="$errors->get('store')" />
                 </div>
               </div>
             </div>
@@ -841,7 +804,7 @@
           if (result.isConfirmed) {
             // requête ajax pour supprimer l'attribut
             $.ajax({
-              url: "{{ route('admin.products.attributes.destroy', [':id', ':attribute_id']) }}"
+              url: "{{ route('vendor.products.attributes.destroy', [':id', ':attribute_id']) }}"
                 .replace(':id', productId).replace(':attribute_id', attributeId),
               method: 'DELETE',
               data: {
@@ -870,7 +833,7 @@
         const data = form.serialize()
 
         $.ajax({
-          url: "{{ route('admin.products.attributes.store', ':id') }}". replace(':id', '{{ $product->id }}'),
+          url: "{{ route('vendor.products.attributes.store', ':id') }}". replace(':id', '{{ $product->id }}'),
           method: 'POST',
           data: data,
           success: function (response) {
@@ -905,7 +868,7 @@
         const data = form.serialize()
 
         $.ajax({
-          url: "{{ route('admin.products.variants.update', ':productid') }}".replace(':productid', '{{ $product->id }}'),
+          url: "{{ route('vendor.products.variants.update', ':productid') }}".replace(':productid', '{{ $product->id }}'),
           method: 'POST',
           data: data,
           success: function (response) {
@@ -1008,7 +971,7 @@
         // Ajax Request
         $.ajax({
           method: "POST",
-          url: "{{ route('admin.products.update', ':id' ) }}" . replace(':id', '{{ $product->id }}'),
+          url: "{{ route('vendor.products.update', ':id' ) }}" . replace(':id', '{{ $product->id }}'),
           data: data,
           contentType: false,
           processData: false,
@@ -1030,7 +993,7 @@
     // dropzone upload image
     Dropzone.autoDiscover = false;
     const imageUploader = new Dropzone('#imageUploader', {
-      url: "{{ route('admin.products.images.upload', ':id') }}" .replace(':id', '{{ $product->id }}'),
+      url: "{{ route('vendor.products.images.upload', ':id') }}" .replace(':id', '{{ $product->id }}'),
       paramName: "image",
       maxFilesize: 10,
       acceptedFiles: "image/*",
@@ -1085,7 +1048,7 @@
 
       $.ajax({
         method: "DELETE",
-        url: "{{ route('admin.products.images.destroy', ':id') }}" .replace(':id', imageId),
+        url: "{{ route('vendor.products.images.destroy', ':id') }}" .replace(':id', imageId),
         headers: {
           'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
@@ -1123,7 +1086,7 @@
       })
 
       $.ajax({
-        url: "{{ route('admin.products.images.reorder') }}",
+        url: "{{ route('vendor.products.images.reorder') }}",
         method: "POST",
         headers: {
           'X-CSRF-TOKEN': '{{ csrf_token() }}'

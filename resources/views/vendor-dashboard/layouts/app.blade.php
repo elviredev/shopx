@@ -5,12 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>Dashboard</title>
-  <!-- BEGIN PAGE LEVEL STYLES -->
-{{--  <link href="./dist/libs/jsvectormap/dist/jsvectormap.css?1750026893" rel="stylesheet" />--}}
-  <!-- END PAGE LEVEL STYLES -->
 
   <!-- JQuery Upload Preview -->
   <link rel="stylesheet" href="{{ asset('assets/global/upload-preview/upload-preview.css') }}">
+  <!-- CDN Tabler Icons -->
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.35.0/dist/tabler-icons.min.css" />
+  <!-- CDN Notyf -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <!-- CDN jQuery Nestable (drag&drop) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.css">
+  <!-- CDN Select2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
   <!-- Custom CSS -->
   <link href="{{ asset('assets/admin/dist/css/tabler.css') }}" rel="stylesheet" />
 
@@ -67,9 +75,20 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <!-- TinyMCE Rich Editor -->
 <script src="{{ asset('assets/admin/dist/js/tinymce/tinymce.min.js') }}"></script>
-
 <!-- JQuery Upload Preview -->
 <script src="{{ asset('assets/global/upload-preview/upload-preview.min.js') }}"></script>
+<!-- Sweetalert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- CDN Notyf JS -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<!-- CDN jQuery Nestable (drag&drop) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.js"></script>
+<!-- CDN Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- Litepicker -->
+<script src="{{ asset('assets/admin/dist/libs/litepicker/dist/litepicker.js') }}" defer></script>
+
+
 <!-- Custom JS -->
 <script src="{{ asset('assets/admin/dist/js/tabler.min.js') }}" defer></script>
 <!-- END GLOBAL MANDATORY SCRIPTS -->
