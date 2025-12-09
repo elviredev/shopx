@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Frontend\KycController;
+use App\Http\Controllers\Frontend\ProductPageController;
 use App\Http\Controllers\Frontend\ProfileController;
 use App\Http\Controllers\Frontend\StoreController;
 use App\Http\Controllers\Frontend\UserDashboardController;
@@ -11,6 +12,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('frontend.home.index');
 });
+
+/** Products routes */
+Route::get('/products', [ProductPageController::class, 'index'])->name('products.index');
+Route::get('/products/{slug}', [ProductPageController::class, 'show'])->name('products.show');
+
+
+
+
 
 /*================= Dashboard USER/VENDOR =================*/
 

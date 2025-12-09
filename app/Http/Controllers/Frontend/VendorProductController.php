@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ProductStoreRequest;
-use App\Http\Requests\Admin\ProductUpdateRequest;
+use App\Http\Requests\Frontend\ProductStoreRequest;
+use App\Http\Requests\Frontend\ProductUpdateRequest;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Brand;
@@ -66,6 +66,7 @@ class VendorProductController extends Controller
     $product->manage_stock = $request->has('manage_stock') ? 'yes' : 'no';
     $product->in_stock = $request->stock_status == 'in_stock' ? 1 : 0;
     $product->status = $request->status;
+    $product->approved_status = 'pending';
     $product->store_id = user()->store->id;
     $product->brand_id = $request->brand;
     $product->is_featured = $request->has('is_featured') ? 1 : 0;
@@ -346,7 +347,6 @@ class VendorProductController extends Controller
     $product->manage_stock = $request->has('manage_stock') ? 'yes' : 'no';
     $product->in_stock = $request->stock_status == 'in_stock' ? 1 : 0;
     $product->status = $request->status;
-    $product->approved_status = 'pending';
     $product->store_id = user()->store->id;
     $product->brand_id = $request->brand;
     $product->is_featured = $request->has('is_featured') ? 1 : 0;
