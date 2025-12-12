@@ -33,7 +33,7 @@ class VendorProductController extends Controller
 
   public function index(): View
   {
-    $products = Product::where('store_id', user()->store->id)->latest()->paginate(30);
+    $products = Product::with(['store'])->where('store_id', user()->store->id)->latest()->paginate(30);
     return view('vendor-dashboard.product.index', compact('products'));
   }
 

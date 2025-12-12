@@ -75,6 +75,24 @@
                   </div>
                 @endforeach
 
+                <input
+                  type="hidden"
+                  id="variants-data"
+                  value="{{ json_encode($product->variants->map(function($variant) {
+                    return [
+                      'id' => $variant->id,
+                      'price' => $variant->price,
+                      'special_price' => $variant->special_price,
+                      'manage_stock' => $variant->manage_stock,
+                      'quantity' => $variant->qty,
+                      'sku' => $variant->sku,
+                      'in_stock' => $variant->in_stock,
+                      'is_default' => $variant->is_default,
+                      'attribute_values' => $variant->attributeValues->pluck('id')
+                    ];
+                  })) }}"
+                >
+
                 <div class="detail-extralink mb-50">
                   <div class="detail-qty border radius">
                     <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
@@ -103,7 +121,11 @@
                         <a href="#" rel="tag">{{ $tag->name }}</a> {{ $loop->last ? '' : ',' }}
                       @endforeach
                     </li>
-                    <li>Stock:<span class="in-stock text-brand ml-5">8 Items In Stock</span></li>
+                    <li>Stock:
+                      <span class="in-stock text-brand ml-5">
+                        <span class="stock-quantity">0</span> Items In Stock
+                      </span>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -692,3 +714,125 @@
     </div>
   </div>
 @endsection
+
+@push('scripts')
+  <script>
+    $(function() {
+      const variantsData = JSON.parse($('#variants-data').val());
+      let selectedValues = new Set()
+
+      //console.log(variantsData);
+
+      function selectDefaultVariant() {
+        if (variantsData.length > 0) {
+          // 1er index
+          const defaultVariant = variantsData[0];
+
+          defaultVariant.attribute_values.forEach(valueId => {
+            // sélectionner la valeur dans le "li"
+            const $badge = $(`.attribute-badge[data-value="${valueId}"]`);
+            // si elle correspond à valueId, ajouter classe active
+            $badge.addClass('active');
+            // affecter la valeur sélectionnée à l'objet Set
+            selectedValues.add(valueId);
+          })
+        }
+      }
+
+      // clic sur un attribut
+      $('.attribute-badge').on('click', function() {
+        const $attributeGroup = $(this).closest('.attribute-group');
+        // définir de nouvelles valeurs
+        selectedValues = new Set(
+          $('.attribute-badge.active').map(function() {
+            return parseInt($(this).attr('data-value'));
+          }).get()
+        );
+
+        updatePrice()
+      })
+
+      // mise à jour du prix selon la variante sélectionnée
+      function updatePrice() {
+        let html;
+        // convertir en tableau afin de pouvoir le parcourir facilement
+        const selectedValuesArray = Array.from(selectedValues);
+
+        const matchingVariant = variantsData.find(variant => {
+          const variantValues = new Set(variant.attribute_values)
+          // vérifier que la taille des valeurs sélectionnées correspond à la taille des valeurs de variante
+          return selectedValuesArray.length === variantValues.size && selectedValuesArray.every(value => variantValues.has(value))
+        })
+
+        if (matchingVariant) {
+          // si quantité > 0 & manage_stock activé, afficher le nombre de produits en stock
+          if (matchingVariant.quantity > 0 && matchingVariant.manage_stock == 1) {
+            $('.stock-quantity').text(matchingVariant.quantity)
+          } else if(matchingVariant.manage_stock == 0 && matchingVariant.in_stock == 1) {
+            $('.stock-quantity').text('Unlimited')
+          } else {
+            $('.stock-quantity').text('0')
+          }
+
+          // si produit indisponible, si quantité < 1 et manage_stock activé, afficher Out of Stock
+          if (matchingVariant.in_stock == 0 || matchingVariant.in_stock == null || matchingVariant.quantity < 1 && matchingVariant.manage_stock == 1) {
+            html = `
+              <div class="product-price primary-color float-left">
+                <span class="current-price text-brand">Out of Stock</span>
+              </div>
+            `
+
+            $('.product-price').replaceWith(html)
+
+            return;
+          }
+
+          if (matchingVariant.special_price > 0) {
+            html = `
+              <div class="product-price primary-color float-left">
+                <span class="current-price text-brand">$${matchingVariant.special_price}</span>
+                <span>
+                  <span class="old-price font-md ml-15">$${matchingVariant.price}</span>
+                </span>
+              </div>
+            `;
+          } else {
+            html = `
+              <div class="product-price primary-color float-left">
+                <span class="current-price text-brand">$${matchingVariant.price}</span>
+              </div>
+            `;
+          }
+
+          $('.product-price').replaceWith(html)
+
+        }
+        //console.log(matchingVariant);
+      }
+
+      // appeler la fonction lorsque le DOM sera entièrement chargé
+      selectDefaultVariant();
+
+    })
+  </script>
+@endpush
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
